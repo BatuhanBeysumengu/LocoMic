@@ -104,7 +104,7 @@ public class MicProcessingEngine : IDisposable
         const int sampleRate = NoiseRemovalSampleProvider.RequiredSampleRate;
         SampleRate = sampleRate;
 
-        _mainBuffer = new BufferedWaveProvider(captureFormat) { DiscardOnBufferOverflow = true };
+        _mainBuffer = new BufferedWaveProvider(captureFormat, TimeSpan.FromSeconds(1)) { DiscardOnBufferOverflow = true };
         var mainChain = new EqChain(bands, channels, sampleRate);
         _mainNoiseRemoval = new NoiseRemovalSampleProvider(To48k(_mainBuffer), () => NoiseRemovalEnabled && !Bypass, () => NoiseRemovalStrength);
         var mainInputDynamics = new InputDynamicsSampleProvider(_mainNoiseRemoval, sampleRate, () => Dynamics, () => Bypass);
@@ -136,7 +136,7 @@ public class MicProcessingEngine : IDisposable
 
         if (monitorDevice != null)
         {
-            _monitorBuffer = new BufferedWaveProvider(captureFormat) { DiscardOnBufferOverflow = true };
+            _monitorBuffer = new BufferedWaveProvider(captureFormat, TimeSpan.FromSeconds(1)) { DiscardOnBufferOverflow = true };
             var monitorChain = new EqChain(bands, channels, sampleRate);
             _monitorNoiseRemoval = new NoiseRemovalSampleProvider(To48k(_monitorBuffer), () => NoiseRemovalEnabled && !Bypass, () => NoiseRemovalStrength);
             var monitorInputDynamics = new InputDynamicsSampleProvider(_monitorNoiseRemoval, sampleRate, () => Dynamics, () => Bypass);
@@ -242,10 +242,24 @@ public class MicProcessingEngine : IDisposable
         return true;
     }
 
+    /// <summary>Audio currently waiting between the mic and the main output (for diagnostics).</summary>
+    public TimeSpan MainBacklog => _mainBuffer?.BufferedDuration ?? TimeSpan.Zero;
+
     private void OnDataAvailable(object? sender, WaveInEventArgs e)
     {
-        _mainBuffer?.AddSamples(e.Buffer, 0, e.BytesRecorded);
-        _monitorBuffer?.AddSamples(e.Buffer, 0, e.BytesRecorded);
+        // The mic and each output run on their own clocks, so trim any backlog
+        // after every block; otherwise the voice slowly drifts seconds behind.
+        if (_mainBuffer != null)
+        {
+            _mainBuffer.AddSamples(e.Buffer, 0, e.BytesRecorded);
+            CaptureBacklog.Trim(_mainBuffer);
+        }
+
+        if (_monitorBuffer != null)
+        {
+            _monitorBuffer.AddSamples(e.Buffer, 0, e.BytesRecorded);
+            CaptureBacklog.Trim(_monitorBuffer);
+        }
     }
 
     private void OnDeviceStoppedUnexpectedly(object? sender, StoppedEventArgs e)
