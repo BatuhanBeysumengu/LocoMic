@@ -14,6 +14,7 @@ public class TrayIconService : IDisposable
     private readonly NotifyIcon _notifyIcon;
     private readonly MainViewModel _viewModel;
     private readonly ToolStripMenuItem _startStopItem;
+    private readonly ToolStripMenuItem _muteItem;
 
     public event EventHandler? ShowRequested;
     public event EventHandler? ExitRequested;
@@ -31,6 +32,10 @@ public class TrayIconService : IDisposable
         _startStopItem = new ToolStripMenuItem("Start");
         _startStopItem.Click += (_, _) => _viewModel.ToggleStartStopCommand.Execute(null);
         menu.Items.Add(_startStopItem);
+
+        _muteItem = new ToolStripMenuItem("Mute");
+        _muteItem.Click += (_, _) => _viewModel.IsMuted = !_viewModel.IsMuted;
+        menu.Items.Add(_muteItem);
 
         menu.Items.Add(new ToolStripSeparator());
 
@@ -53,7 +58,7 @@ public class TrayIconService : IDisposable
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(MainViewModel.IsRunning))
+        if (e.PropertyName is nameof(MainViewModel.IsRunning) or nameof(MainViewModel.IsMuted) or nameof(MainViewModel.SelectedPreset))
         {
             UpdateStatus();
         }
@@ -63,7 +68,18 @@ public class TrayIconService : IDisposable
     {
         bool running = _viewModel.IsRunning;
         _startStopItem.Text = running ? "Stop" : "Start";
-        _notifyIcon.Text = running ? "Equalizer Helper — Running" : "Equalizer Helper — Stopped";
+        _muteItem.Checked = _viewModel.IsMuted;
+
+        // The tray tooltip doubles as feedback for hotkeys used while the window is hidden.
+        string state = !running ? "Stopped" : _viewModel.IsMuted ? "Muted" : "Running";
+        string text = $"Equalizer Helper — {state}";
+        if (_viewModel.SelectedPreset != null)
+        {
+            text += $" — {_viewModel.SelectedPreset.Name}";
+        }
+
+        // NotifyIcon.Text is limited to 127 characters.
+        _notifyIcon.Text = text.Length > 127 ? text[..127] : text;
     }
 
     public void Dispose()

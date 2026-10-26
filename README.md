@@ -24,6 +24,16 @@ A Windows desktop app that cleans up (or messes with) your microphone in real ti
 - **Mic Crunch** – distortion + compression for an overdriven-mic effect.
 - **Presets** – built-in presets (Flat, Voice Clarity, De-Boom, De-Harsh Sibilance, Deep Bass (Fun)), plus as many presets of your own as you like. Every preset (built-in ones too) can be tweaked and saved, and each one stores the EQ, dynamics, pitch and Mic Crunch.
 - **Bypass** – instantly compare processed vs. original sound.
+- **Mute** – silence your mic instantly (also from the tray menu).
+- **Global hotkeys** – work everywhere, even in-game or with the app in the tray (customizable under **Hotkeys...**):
+
+  | Action                  | Default            |
+  |-------------------------|--------------------|
+  | Toggle Bypass           | `Ctrl+Alt+B`       |
+  | Toggle Mute             | `Ctrl+Alt+M`       |
+  | Next / previous preset  | `Ctrl+Alt+→` / `Ctrl+Alt+←` |
+  | Jump to preset 1–9      | `Ctrl+Alt+1` … `Ctrl+Alt+9` |
+
 - **Monitoring** – hear yourself through headphones while tuning.
 - **Live level meters** for input and output.
 - **System tray** – keep it running in the background; start/stop from the tray icon.

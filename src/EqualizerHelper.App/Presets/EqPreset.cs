@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using EqualizerHelper.Dsp;
 
 namespace EqualizerHelper.App.Presets;

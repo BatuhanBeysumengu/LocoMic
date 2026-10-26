@@ -135,8 +135,11 @@
                         <ComboBox Grid.Column="1" Width="260" Margin="8,0,0,0" ItemsSource="{Binding RenderDevices}"
                                   SelectedItem="{Binding SelectedMonitorDevice}" VerticalAlignment="Center" />
 
-                        <CheckBox Grid.Column="2" Content="Start with Windows" VerticalAlignment="Center"
-                                  HorizontalAlignment="Right" IsChecked="{Binding StartWithWindows}" />
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Button Content="Hotkeys..." Padding="12,6" Margin="0,0,16,0" Command="{Binding EditHotkeysCommand}"
+                                    ToolTip="Global shortcuts for Bypass, Mute and switching presets" />
+                            <CheckBox Content="Start with Windows" VerticalAlignment="Center" IsChecked="{Binding StartWithWindows}" />
+                        </StackPanel>
                     </Grid>
 
                     <!-- Transport + presets -->
@@ -165,8 +168,11 @@
                             </Button.Style>
                         </Button>
 
-                        <CheckBox Grid.Column="1" Content="Bypass" VerticalAlignment="Center" Margin="16,0,0,0"
-                                  IsChecked="{Binding Bypass}" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+                            <CheckBox Content="Bypass" VerticalAlignment="Center" IsChecked="{Binding Bypass}" />
+                            <CheckBox Content="Mute" VerticalAlignment="Center" Margin="12,0,0,0" IsChecked="{Binding IsMuted}"
+                                      ToolTip="Silences your processed mic (and the monitor)" />
+                        </StackPanel>
 
                         <Button Grid.Column="2" Padding="14,8" Margin="16,0,0,0" Command="{Binding ToggleAutoTuneCommand}">
                             <Button.Style>

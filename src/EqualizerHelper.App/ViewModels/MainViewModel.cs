@@ -34,6 +34,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         VirtualCableDetected = vbCable != null;
 
         var savedSettings = AppSettingsStore.Load();
+        Hotkeys = HotkeyGesture.FromSettings(savedSettings.Hotkeys);
 
         SelectedCaptureDevice = CaptureDevices.FirstOrDefault(d => d.Id == savedSettings.CaptureDeviceId)
             ?? CaptureDevices.FirstOrDefault();
@@ -118,6 +119,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private bool bypass;
 
     [ObservableProperty]
+    private bool isMuted;
+
+    /// <summary>The user's current global hotkeys (null = disabled for that action).</summary>
+    public Dictionary<HotkeyAction, HotkeyGesture?> Hotkeys { get; private set; }
+
+    /// <summary>Raised after the user edits the hotkeys, so the window can re-register them.</summary>
+    public event EventHandler? HotkeysChanged;
+
+    [ObservableProperty]
     private float inputLevel;
 
     [ObservableProperty]
@@ -185,6 +195,77 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _engine.Bypass = value;
     }
 
+    partial void OnIsMutedChanged(bool value)
+    {
+        _engine.Muted = value;
+    }
+
+    public void ExecuteHotkey(HotkeyAction action)
+    {
+        switch (action)
+        {
+            case HotkeyAction.ToggleBypass:
+                Bypass = !Bypass;
+                StatusMessage = Bypass ? "Bypass on (hotkey) — you're sending your unprocessed mic." : "Bypass off (hotkey).";
+                break;
+            case HotkeyAction.ToggleMute:
+                IsMuted = !IsMuted;
+                StatusMessage = IsMuted ? "Muted (hotkey)." : "Unmuted (hotkey).";
+                break;
+            case HotkeyAction.NextPreset:
+                StepPreset(+1);
+                break;
+            case HotkeyAction.PreviousPreset:
+                StepPreset(-1);
+                break;
+        }
+    }
+
+    /// <summary>Selects the Nth preset in the list (1-based, not counting "+ New preset...").</summary>
+    public void SelectPresetByNumber(int number)
+    {
+        var presets = Presets.Where(p => p != NewPresetItem).ToList();
+        if (number < 1 || number > presets.Count)
+        {
+            return;
+        }
+
+        SelectedPreset = presets[number - 1];
+        StatusMessage = $"Preset: {SelectedPreset.Name} (hotkey).";
+    }
+
+    private void StepPreset(int delta)
+    {
+        var presets = Presets.Where(p => p != NewPresetItem).ToList();
+        if (presets.Count == 0)
+        {
+            return;
+        }
+
+        int index = SelectedPreset == null ? -1 : presets.IndexOf(SelectedPreset);
+        int next = ((index + delta) % presets.Count + presets.Count) % presets.Count;
+        SelectedPreset = presets[next];
+        StatusMessage = $"Preset: {SelectedPreset.Name} (hotkey).";
+    }
+
+    [RelayCommand]
+    private void EditHotkeys()
+    {
+        var dialog = new HotkeysDialog(Hotkeys)
+        {
+            Owner = System.Windows.Application.Current?.MainWindow,
+        };
+
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        Hotkeys = dialog.Result;
+        SavePersistedSettings();
+        HotkeysChanged?.Invoke(this, EventArgs.Empty);
+    }
+
     partial void OnSelectedCaptureDeviceChanged(AudioDeviceInfo? value) => SavePersistedSettings();
 
     partial void OnSelectedRenderDeviceChanged(AudioDeviceInfo? value) => SavePersistedSettings();
@@ -215,6 +296,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             MonitorDeviceId = SelectedMonitorDevice?.Id,
             MonitorEnabled = MonitorEnabled,
             PresetName = SelectedPreset?.Name,
+            Hotkeys = HotkeyGesture.ToSettings(Hotkeys),
         });
     }
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,6 +27,9 @@ public class MicProcessingEngine : IDisposable
     private AnalysisTapSampleProvider? _analysisTap;
 
     public bool Bypass { get; set; }
+
+    /// <summary>Silences both the main output and the monitor.</summary>
+    public bool Muted { get; set; }
 
     /// <summary>
     /// 1.0 = no pitch change. &lt;1 lowers pitch, &gt;1 raises it. Applied
@@ -93,7 +96,7 @@ public class MicProcessingEngine : IDisposable
         }
 
         var mainOutputDynamics = new OutputDynamicsSampleProvider(mainCompressor, sampleRate, () => Dynamics, () => Bypass);
-        var mainResampled = new MediaFoundationResampler(mainOutputDynamics.ToWaveProvider(), outputMixFormat)
+        var mainResampled = new MediaFoundationResampler(new MuteSampleProvider(mainOutputDynamics, () => Muted).ToWaveProvider(), outputMixFormat)
         {
             ResamplerQuality = 60,
         };
@@ -118,7 +121,7 @@ public class MicProcessingEngine : IDisposable
             }
 
             var monitorOutputDynamics = new OutputDynamicsSampleProvider(monitorCompressor, sampleRate, () => Dynamics, () => Bypass);
-            var monitorResampled = new MediaFoundationResampler(monitorOutputDynamics.ToWaveProvider(), monitorMixFormat)
+            var monitorResampled = new MediaFoundationResampler(new MuteSampleProvider(monitorOutputDynamics, () => Muted).ToWaveProvider(), monitorMixFormat)
             {
                 ResamplerQuality = 60,
             };
