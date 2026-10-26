@@ -59,23 +59,24 @@ Or open `EqualizerHelper.sln` in Visual Studio 2022 and press F5.
 
 ## How to use
 
-The app has a menu on the left (click **☰** in the top-left corner to collapse it to icons). Hover over any button, checkbox or slider for a short explanation.
+The app has three pages in the menu on the left: **Home**, **Sound** and **Settings** (click **☰** in the top-left corner to collapse the menu to icons). Hover over any button, checkbox or slider for a short explanation.
 
 1. **Install VB-Audio Virtual Cable** and restart if prompted.
-2. **Settings** page – pick your devices:
+2. **Settings** – pick your devices:
    - **Microphone:** your real mic.
    - **Output:** `CABLE Input (VB-Audio Virtual Cable)`.
-   - Optionally tick **Hear yourself while tuning** and choose your headphones.
-3. **Home** page – press **Start** and check that the *Input* meter moves when you talk.
-4. **Clean-up** page – tick **AI noise removal** if there's background noise. Raise **Gain** if the *Input* meter barely moves, raise **Gate** until noise disappears between words, and add **Loudness** for a fuller, more even voice. Or press **Auto-Tune Voice**, talk for a few seconds, then click **Keep** or **Revert** in the bar at the bottom.
-5. **Equalizer** page – drag the bands to shape your voice.
-6. **Voice effects** page – change **Pitch** or add **Mic Crunch** for fun.
-7. **Home** page – manage presets:
+3. **Home** – tick **Hear yourself** and choose your headphones if you want to listen while tuning, then press **Start** and check that the *Input* meter moves when you talk.
+4. **Sound** – shape your voice:
+   - **Clean-up:** tick **AI noise removal** if there's background noise. Raise **Gain** if the *Input* meter barely moves, raise **Gate** until noise disappears between words, and add **Loudness** for a fuller, more even voice.
+   - **Voice effects:** change **Pitch** or add **Crunch** for fun.
+   - **Auto-Tune Voice:** talk for a few seconds, then click **Keep** or **Revert** in the bar at the bottom.
+   - **Equalizer:** drag the bands to fine-tune your sound.
+5. **Home** – manage presets:
    - **+ New preset...** (top of the dropdown) – creates a new preset from your current settings under a name of your choice.
    - **Save** – stores your changes into the selected preset.
    - **Delete** – removes one of your own presets. For a built-in preset you've changed, this button becomes **Reset** and restores its original settings.
-   - To share presets, use **Import presets...** / **Export current preset...** on the **Settings** page. Imports never overwrite: a name that's already taken gets a number added (e.g. "My Voice (2)").
-8. **In Discord / OBS / Zoom**, set the input/microphone device to `CABLE Output (VB-Audio Virtual Cable)`.
+   - To share presets, use **Import...** / **Export current...** on the **Settings** page. Imports never overwrite: a name that's already taken gets a number added (e.g. "My Voice (2)").
+6. **In Discord / OBS / Zoom**, set the input/microphone device to `CABLE Output (VB-Audio Virtual Cable)`.
 
 Closing the window keeps the app in the system tray; use the tray menu to show it, start/stop processing, or exit.
 
