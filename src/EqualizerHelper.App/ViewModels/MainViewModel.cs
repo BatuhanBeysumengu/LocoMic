@@ -51,8 +51,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Bands = new ObservableCollection<EqBandViewModel>(
             bands.Select((band, i) => new EqBandViewModel(roles[i].Label, band)));
 
-        Presets = new ObservableCollection<EqPreset>(PresetStore.GetBuiltInPresets().Concat(PresetStore.LoadUserPresets()));
-        SelectedPreset = Presets.FirstOrDefault(p => p.Name == savedSettings.PresetName) ?? Presets.FirstOrDefault();
+        Presets = new ObservableCollection<EqPreset>(PresetStore.LoadAllPresets().Prepend(NewPresetItem));
+        SelectedPreset = Presets.FirstOrDefault(p => p != NewPresetItem && p.Name == savedSettings.PresetName)
+            ?? Presets.FirstOrDefault(p => p != NewPresetItem);
 
         _settingsLoaded = true;
 
@@ -88,6 +89,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public ObservableCollection<AudioDeviceInfo> RenderDevices { get; }
     public ObservableCollection<EqBandViewModel> Bands { get; }
     public ObservableCollection<EqPreset> Presets { get; }
+
+    /// <summary>
+    /// Placeholder shown at the top of the preset list; picking it creates a
+    /// new preset instead of loading one.
+    /// </summary>
+    public static readonly EqPreset NewPresetItem = new("+ New preset...", new List<EqBandSettings>());
 
     [ObservableProperty]
     private AudioDeviceInfo? selectedCaptureDevice;
@@ -190,23 +197,41 @@ public partial class MainViewModel : ObservableObject, IDisposable
         });
     }
 
-    partial void OnSelectedPresetChanged(EqPreset? value)
+    partial void OnSelectedPresetChanged(EqPreset? oldValue, EqPreset? newValue)
     {
-        if (value == null)
+        if (newValue == NewPresetItem)
+        {
+            // Put the previous selection back first (deferred, since the
+            // ComboBox is still mid-change), then ask for the new preset.
+            System.Windows.Application.Current?.Dispatcher.BeginInvoke(() =>
+            {
+                SelectedPreset = oldValue;
+                NewPreset();
+            });
+            return;
+        }
+
+        NotifyPresetActionsChanged();
+
+        if (newValue == null)
         {
             return;
         }
 
-        for (int i = 0; i < Bands.Count && i < value.Bands.Count; i++)
+        ApplyPreset(newValue);
+        SavePersistedSettings();
+    }
+
+    private void ApplyPreset(EqPreset preset)
+    {
+        for (int i = 0; i < Bands.Count && i < preset.Bands.Count; i++)
         {
-            Bands[i].GainDb = value.Bands[i].GainDb;
-            Bands[i].Q = value.Bands[i].Q;
+            Bands[i].GainDb = preset.Bands[i].GainDb;
+            Bands[i].Q = preset.Bands[i].Q;
         }
 
-        PitchSemitones = value.PitchSemitones;
-        MicCrunch = value.MicCrunch;
-
-        SavePersistedSettings();
+        PitchSemitones = preset.PitchSemitones;
+        MicCrunch = preset.MicCrunch;
     }
 
     [RelayCommand]
@@ -337,35 +362,176 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         CanRevertAutoTune = false;
 
-        var dialog = new NamePresetDialog { Owner = System.Windows.Application.Current?.MainWindow };
-        if (dialog.ShowDialog() == true)
+        var preset = PromptAndSaveCurrentAsPreset(initialName: "", cancelText: "Don't Save");
+        StatusMessage = preset != null
+            ? $"Saved \"{preset.Name}\" as a preset and kept these settings."
+            : "Kept auto-tuned settings.";
+    }
+
+    /// <summary>
+    /// Creates a preset of the user's own from the current settings, so it
+    /// can be tweaked further and stored with Save.
+    /// </summary>
+    private void NewPreset()
+    {
+        var preset = PromptAndSaveCurrentAsPreset(initialName: "", cancelText: "Cancel");
+        if (preset != null)
         {
-            var bandSettings = Bands.Select(b => new EqBandSettings
-            {
-                FrequencyHz = b.FrequencyHz,
-                GainDb = b.GainDb,
-                Q = b.Q,
-                FilterType = b.Band.FilterType,
-            }).ToList();
+            StatusMessage = $"Created \"{preset.Name}\" from the current settings. Adjust it, then click Save.";
+        }
+    }
 
-            var preset = new EqPreset(dialog.PresetName, bandSettings) { PitchSemitones = PitchSemitones, MicCrunch = MicCrunch };
-            PresetStore.SaveUserPreset(preset);
+    /// <summary>
+    /// Stores the current EQ, pitch and crunch into the selected preset.
+    /// </summary>
+    [RelayCommand]
+    private void SavePreset()
+    {
+        var selected = SelectedPreset;
+        if (selected == null || selected == NewPresetItem)
+        {
+            NewPreset();
+            return;
+        }
 
-            var existing = Presets.FirstOrDefault(p => p.Name == preset.Name);
-            if (existing != null)
-            {
-                Presets.Remove(existing);
-            }
+        StoreUserPreset(CreatePresetFromCurrentSettings(selected.Name));
+        StatusMessage = $"Saved changes to \"{selected.Name}\".";
+    }
 
-            Presets.Add(preset);
-            SelectedPreset = preset;
+    /// <summary>
+    /// Deletes the selected user preset, or — for a built-in preset the user
+    /// has edited — resets it to its original settings.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanDeletePreset))]
+    private void DeletePreset()
+    {
+        var preset = SelectedPreset;
+        if (preset == null || !CanDeletePreset())
+        {
+            return;
+        }
 
-            StatusMessage = $"Saved \"{preset.Name}\" as a preset and kept these settings.";
+        var builtIn = PresetStore.GetBuiltInPreset(preset.Name);
+        string question = builtIn != null
+            ? $"Reset \"{preset.Name}\" to its original settings?"
+            : $"Delete the preset \"{preset.Name}\"?";
+
+        var answer = System.Windows.MessageBox.Show(
+            question,
+            builtIn != null ? "Reset Preset" : "Delete Preset",
+            System.Windows.MessageBoxButton.YesNo,
+            System.Windows.MessageBoxImage.Question);
+        if (answer != System.Windows.MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        PresetStore.DeleteUserPreset(preset.Name);
+
+        if (builtIn != null)
+        {
+            CopySettings(builtIn, preset);
+            ApplyPreset(preset);
+            NotifyPresetActionsChanged();
+            StatusMessage = $"Reset \"{preset.Name}\" to its original settings.";
         }
         else
         {
-            StatusMessage = "Kept auto-tuned settings.";
+            Presets.Remove(preset);
+            SelectedPreset = Presets.FirstOrDefault(p => p != NewPresetItem);
+            StatusMessage = $"Deleted \"{preset.Name}\".";
         }
+    }
+
+    public bool IsUserPresetSelected =>
+        SelectedPreset != null && SelectedPreset != NewPresetItem && !PresetStore.IsBuiltInName(SelectedPreset.Name);
+
+    public string DeleteButtonText =>
+        SelectedPreset != null && PresetStore.IsBuiltInName(SelectedPreset.Name) ? "Reset" : "Delete";
+
+    private bool CanDeletePreset() =>
+        IsUserPresetSelected
+        || (SelectedPreset != null && PresetStore.IsBuiltInName(SelectedPreset.Name) && PresetStore.HasUserVersion(SelectedPreset.Name));
+
+    private string? ValidateNewPresetName(string name)
+    {
+        if (name == NewPresetItem.Name)
+        {
+            return "Please pick a different name.";
+        }
+
+        return Presets.Any(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase))
+            ? $"A preset called \"{name}\" already exists. Select it and click Save to update it, or pick a different name."
+            : null;
+    }
+
+    private EqPreset? PromptAndSaveCurrentAsPreset(string initialName, string cancelText)
+    {
+        var dialog = new NamePresetDialog(initialName: initialName, cancelText: cancelText, validate: ValidateNewPresetName)
+        {
+            Owner = System.Windows.Application.Current?.MainWindow,
+        };
+
+        if (dialog.ShowDialog() != true)
+        {
+            return null;
+        }
+
+        var preset = CreatePresetFromCurrentSettings(dialog.PresetName);
+        StoreUserPreset(preset);
+        return preset;
+    }
+
+    private EqPreset CreatePresetFromCurrentSettings(string name)
+    {
+        var bandSettings = Bands.Select(b => new EqBandSettings
+        {
+            FrequencyHz = b.FrequencyHz,
+            GainDb = b.GainDb,
+            Q = b.Q,
+            FilterType = b.Band.FilterType,
+        }).ToList();
+
+        return new EqPreset(name, bandSettings) { PitchSemitones = PitchSemitones, MicCrunch = MicCrunch };
+    }
+
+    private void StoreUserPreset(EqPreset preset)
+    {
+        PresetStore.SaveUserPreset(preset);
+
+        // Update an existing entry in place (rather than replacing it in the
+        // collection) so the ComboBox selection and list position stay put.
+        var existing = Presets.FirstOrDefault(p => p != NewPresetItem && p.Name == preset.Name);
+        if (existing != null)
+        {
+            CopySettings(preset, existing);
+            SelectedPreset = existing;
+            NotifyPresetActionsChanged();
+            return;
+        }
+
+        Presets.Add(preset);
+        SelectedPreset = preset;
+    }
+
+    private static void CopySettings(EqPreset from, EqPreset to)
+    {
+        to.Bands = from.Bands.Select(b => new EqBandSettings
+        {
+            FrequencyHz = b.FrequencyHz,
+            GainDb = b.GainDb,
+            Q = b.Q,
+            FilterType = b.FilterType,
+        }).ToList();
+        to.PitchSemitones = from.PitchSemitones;
+        to.MicCrunch = from.MicCrunch;
+    }
+
+    private void NotifyPresetActionsChanged()
+    {
+        OnPropertyChanged(nameof(IsUserPresetSelected));
+        OnPropertyChanged(nameof(DeleteButtonText));
+        DeletePresetCommand.NotifyCanExecuteChanged();
     }
 
     [RelayCommand]

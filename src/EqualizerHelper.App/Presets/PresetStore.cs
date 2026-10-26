@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -62,12 +62,47 @@ public static class PresetStore
         return JsonSerializer.Deserialize<List<EqPreset>>(json) ?? new List<EqPreset>();
     }
 
+    /// <summary>
+    /// Built-in presets first (replaced by the user's saved version when they
+    /// have edited one), followed by the user's own presets.
+    /// </summary>
+    public static List<EqPreset> LoadAllPresets()
+    {
+        var userPresets = LoadUserPresets();
+        var builtIns = GetBuiltInPresets()
+            .Select(b => userPresets.FirstOrDefault(u => u.Name == b.Name) ?? b)
+            .ToList();
+        var builtInNames = builtIns.Select(b => b.Name).ToHashSet();
+
+        return builtIns.Concat(userPresets.Where(u => !builtInNames.Contains(u.Name))).ToList();
+    }
+
+    public static EqPreset? GetBuiltInPreset(string name) =>
+        GetBuiltInPresets().FirstOrDefault(p => p.Name == name);
+
+    public static bool IsBuiltInName(string name) => GetBuiltInPreset(name) != null;
+
+    public static bool HasUserVersion(string name) => LoadUserPresets().Any(p => p.Name == name);
+
     public static void SaveUserPreset(EqPreset preset)
     {
         var presets = LoadUserPresets();
         presets.RemoveAll(p => p.Name == preset.Name);
         presets.Add(preset);
+        WriteUserPresets(presets);
+    }
 
+    public static void DeleteUserPreset(string name)
+    {
+        var presets = LoadUserPresets();
+        if (presets.RemoveAll(p => p.Name == name) > 0)
+        {
+            WriteUserPresets(presets);
+        }
+    }
+
+    private static void WriteUserPresets(List<EqPreset> presets)
+    {
         string? directory = Path.GetDirectoryName(UserPresetsPath);
         if (directory != null)
         {

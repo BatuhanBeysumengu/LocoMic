@@ -148,6 +148,8 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <Button Grid.Column="0" Padding="20,9" Command="{Binding ToggleStartStopCommand}">
@@ -182,6 +184,12 @@
                         <TextBlock Grid.Column="4" Text="Preset:" Style="{StaticResource SectionLabelStyle}" />
                         <ComboBox Grid.Column="5" Width="180" ItemsSource="{Binding Presets}"
                                   SelectedItem="{Binding SelectedPreset}" />
+                        <Button Grid.Column="6" Content="Save" Padding="12,8" Margin="8,0,0,0"
+                                Command="{Binding SavePresetCommand}"
+                                ToolTip="Save the current EQ, pitch and crunch into the selected preset" />
+                        <Button Grid.Column="7" Content="{Binding DeleteButtonText}" Padding="12,8" Margin="8,0,0,0"
+                                Command="{Binding DeletePresetCommand}"
+                                ToolTip="Delete your preset, or reset an edited built-in preset to its original settings" />
                     </Grid>
 
                     <!-- Pitch (fun voice effect) -->
