@@ -1,0 +1,63 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa]rm64/
+[Ll]og/
+[Ll]ogs/
+artifacts/
+publish/
+*.wpftmp.csproj
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# Test results / coverage
+[Tt]est[Rr]esult*/
+*.trx
+coverage*.json
+coverage*.xml
+*.coverage
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+
+# Publish / installers
+*.pubxml.user
+*.msi
+*.msix
+*.appx
+*.zip
+
+# Local user data (normally in %APPDATA%\EqualizerHelper, ignored here in case copied in)
+presets.json
+settings.json
+
+# Audio recordings / large media
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.m4a
+
+# Secrets
+.env
+*.pfx
+*.snk
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
