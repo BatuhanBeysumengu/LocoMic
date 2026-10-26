@@ -444,7 +444,27 @@
                                                 <ItemsControl ItemsSource="{Binding Sounds}">
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate>
-                                                            <Grid Margin="0,1">
+                                                            <Border Background="Transparent" BorderThickness="0,2,0,0" CornerRadius="0" Margin="0,0,0,1"
+                                                                    AllowDrop="True" DragOver="SoundRow_DragOver" DragEnter="SoundRow_DragOver"
+                                                                    DragLeave="SoundRow_DragLeave" Drop="SoundRow_Drop">
+                                                            <Border.Style>
+                                                                <Style TargetType="Border">
+                                                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                                                    <Style.Triggers>
+                                                                        <!-- Drop indicator: an accent line where the dragged sound will land. -->
+                                                                        <Trigger Property="Tag" Value="DropTarget">
+                                                                            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                                                        </Trigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Border.Style>
+                                                            <Border.ContextMenu>
+                                                                <ContextMenu>
+                                                                    <MenuItem Header="Move up" Click="SoundMoveUp_Click" />
+                                                                    <MenuItem Header="Move down" Click="SoundMoveDown_Click" />
+                                                                </ContextMenu>
+                                                            </Border.ContextMenu>
+                                                            <Grid>
                                                                 <Grid.ColumnDefinitions>
                                                                     <ColumnDefinition Width="18" />
                                                                     <ColumnDefinition Width="Auto" />
@@ -455,8 +475,9 @@
                                                                 </Grid.ColumnDefinitions>
 
                                                                 <TextBlock Grid.Column="0" Text="{Binding Number}" FontSize="11" VerticalAlignment="Center"
-                                                                           HorizontalAlignment="Center" Foreground="{StaticResource TextMutedBrush}"
-                                                                           ToolTip="Hotkey number: while started, press this key on the numpad to play/stop the sound (changeable in Settings)" />
+                                                                           HorizontalAlignment="Center" Foreground="{StaticResource TextMutedBrush}" Cursor="SizeAll"
+                                                                           MouseLeftButtonDown="SoundDrag_MouseDown" MouseMove="SoundDrag_MouseMove"
+                                                                           ToolTip="Numpad key for this sound (while started). Drag to another row to change its number, or right-click to move it." />
                                                                 <Button Grid.Column="1" Style="{StaticResource IconButtonStyle}"
                                                                         Command="{Binding DataContext.ToggleSoundCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                                         CommandParameter="{Binding}">
@@ -491,7 +512,9 @@
                                                                 </Button>
 
                                                                 <TextBlock Grid.Column="2" Text="{Binding Name}" VerticalAlignment="Center" Margin="6,0,8,0"
-                                                                           TextTrimming="CharacterEllipsis" ToolTip="{Binding Path}">
+                                                                           TextTrimming="CharacterEllipsis" Cursor="SizeAll" Background="Transparent"
+                                                                           MouseLeftButtonDown="SoundDrag_MouseDown" MouseMove="SoundDrag_MouseMove"
+                                                                           ToolTip="{Binding Path, StringFormat={}{0}&#x0a;Drag to reorder (the number is its numpad key); right-click to move.}">
                                                                     <TextBlock.Style>
                                                                         <Style TargetType="TextBlock">
                                                                             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -520,6 +543,7 @@
                                                                                Foreground="{StaticResource TextSecondaryBrush}" />
                                                                 </Button>
                                                             </Grid>
+                                                            </Border>
                                                         </DataTemplate>
                                                     </ItemsControl.ItemTemplate>
                                                 </ItemsControl>

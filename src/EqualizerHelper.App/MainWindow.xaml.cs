@@ -50,6 +50,17 @@ public partial class MainWindow : Window
         _hotkeys = new GlobalHotkeyService(hwnd);
         RegisterHotkeys();
         _viewModel.HotkeysChanged += (_, _) => RegisterHotkeys();
+        _viewModel.HotkeyEditingChanged += (_, editing) =>
+        {
+            if (editing)
+            {
+                _hotkeys?.UnregisterAll();
+            }
+            else
+            {
+                RegisterHotkeys();
+            }
+        };
 
         // Sound hotkeys (plain numpad keys by default) are only held while the
         // engine runs, so the numpad types normally in other apps otherwise.
@@ -171,6 +182,86 @@ public partial class MainWindow : Window
         }
 
         PageNameText.Text = pageName;
+    }
+
+    // Soundboard drag-and-drop: drag a sound by its number or name onto
+    // another row to take that row's position (and hotkey number).
+    private System.Windows.Point _soundDragStart;
+    private SoundItemViewModel? _soundDragItem;
+
+    private void SoundDrag_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        _soundDragStart = e.GetPosition(this);
+        _soundDragItem = (sender as FrameworkElement)?.DataContext as SoundItemViewModel;
+    }
+
+    private void SoundDrag_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        if (_soundDragItem == null || e.LeftButton != MouseButtonState.Pressed)
+        {
+            return;
+        }
+
+        var delta = e.GetPosition(this) - _soundDragStart;
+        if (Math.Abs(delta.X) < SystemParameters.MinimumHorizontalDragDistance
+            && Math.Abs(delta.Y) < SystemParameters.MinimumVerticalDragDistance)
+        {
+            return;
+        }
+
+        var item = _soundDragItem;
+        _soundDragItem = null;
+        System.Windows.DragDrop.DoDragDrop((DependencyObject)sender, item, System.Windows.DragDropEffects.Move);
+    }
+
+    private void SoundRow_DragOver(object sender, System.Windows.DragEventArgs e)
+    {
+        bool isSound = e.Data.GetDataPresent(typeof(SoundItemViewModel));
+        e.Effects = isSound ? System.Windows.DragDropEffects.Move : System.Windows.DragDropEffects.None;
+        if (isSound && sender is FrameworkElement row)
+        {
+            row.Tag = "DropTarget";
+        }
+
+        e.Handled = true;
+    }
+
+    private void SoundRow_DragLeave(object sender, System.Windows.DragEventArgs e)
+    {
+        if (sender is FrameworkElement row)
+        {
+            row.Tag = null;
+        }
+    }
+
+    private void SoundRow_Drop(object sender, System.Windows.DragEventArgs e)
+    {
+        if (sender is not FrameworkElement { DataContext: SoundItemViewModel target } row)
+        {
+            return;
+        }
+
+        row.Tag = null;
+        if (e.Data.GetData(typeof(SoundItemViewModel)) is SoundItemViewModel dragged)
+        {
+            _viewModel.MoveSound(dragged, _viewModel.Sounds.IndexOf(target));
+        }
+    }
+
+    private void SoundMoveUp_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is SoundItemViewModel sound)
+        {
+            _viewModel.MoveSoundUpCommand.Execute(sound);
+        }
+    }
+
+    private void SoundMoveDown_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is SoundItemViewModel sound)
+        {
+            _viewModel.MoveSoundDownCommand.Execute(sound);
+        }
     }
 
     private void Close_Click(object sender, RoutedEventArgs e)

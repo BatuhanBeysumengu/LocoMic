@@ -298,6 +298,40 @@ public partial class MainViewModel : ObservableObject, IDisposable
         sound.Number = Sounds.Count;
     }
 
+    /// <summary>Moves a sound to a new position (its hotkey number follows the position).</summary>
+    public void MoveSound(SoundItemViewModel sound, int newIndex)
+    {
+        int oldIndex = Sounds.IndexOf(sound);
+        newIndex = Math.Clamp(newIndex, 0, Sounds.Count - 1);
+        if (oldIndex < 0 || oldIndex == newIndex)
+        {
+            return;
+        }
+
+        Sounds.Move(oldIndex, newIndex);
+        RenumberSounds();
+        SavePersistedSettings();
+        StatusMessage = $"\"{sound.Name}\" is now sound {sound.Number}.";
+    }
+
+    [RelayCommand]
+    private void MoveSoundUp(SoundItemViewModel? sound)
+    {
+        if (sound != null)
+        {
+            MoveSound(sound, Sounds.IndexOf(sound) - 1);
+        }
+    }
+
+    [RelayCommand]
+    private void MoveSoundDown(SoundItemViewModel? sound)
+    {
+        if (sound != null)
+        {
+            MoveSound(sound, Sounds.IndexOf(sound) + 1);
+        }
+    }
+
     private void RenumberSounds()
     {
         for (int i = 0; i < Sounds.Count; i++)
@@ -348,6 +382,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     /// <summary>Raised after the user edits the hotkeys, so the window can re-register them.</summary>
     public event EventHandler? HotkeysChanged;
+
+    /// <summary>
+    /// Raised with true while the Hotkeys dialog is open (so the window can
+    /// release every global hotkey and the dialog can capture those keys),
+    /// then with false when it closes.
+    /// </summary>
+    public event EventHandler<bool>? HotkeyEditingChanged;
 
     [ObservableProperty]
     private float inputLevel;
@@ -498,7 +539,20 @@ public partial class MainViewModel : ObservableObject, IDisposable
             Owner = System.Windows.Application.Current?.MainWindow,
         };
 
-        if (dialog.ShowDialog() != true)
+        // While a key is registered globally, Windows delivers it to the
+        // hotkey instead of the dialog, so pause them all while editing.
+        HotkeyEditingChanged?.Invoke(this, true);
+        bool saved;
+        try
+        {
+            saved = dialog.ShowDialog() == true;
+        }
+        finally
+        {
+            HotkeyEditingChanged?.Invoke(this, false);
+        }
+
+        if (!saved)
         {
             return;
         }

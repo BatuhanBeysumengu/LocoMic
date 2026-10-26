@@ -74,7 +74,7 @@ Everything you use day to day is on the main screen. Devices, hotkeys, startup a
 4. **Shape your sound:**
    - **Clean-up:** tick **AI noise removal** if there's background noise. Raise **Gain** if the *Input* meter barely moves, raise **Gate** until noise disappears between words, and add **Loudness** for a fuller, more even voice.
    - **Voice:** change **Pitch** or add **Crunch** for fun.
-   - **Sounds:** click **+ Add** to add songs or sound effects, then press ▶ or its numpad key (the number next to it) to play it into your mic; press again to stop. `Num0` stops everything. Tick ⟲ to loop background music, and keep **Lower while I talk** on so people can still understand you. Sounds only play while the app is started.
+   - **Sounds:** click **+ Add** to add songs or sound effects, then press ▶ or its numpad key (the number next to it) to play it into your mic; press again to stop. `Num0` stops everything. Drag a sound by its number or name onto another row to change its position and numpad key (or right-click it → Move up / Move down). Tick ⟲ to loop background music, and keep **Lower while I talk** on so people can still understand you. Sounds only play while the app is started.
    - **Equalizer:** drag the bands to fine-tune your sound, or press **Auto-Tune Voice**, talk for a few seconds, then click **Keep** or **Revert** at the bottom.
 5. **Presets** (top-right of the main screen):
    - **+ New preset...** (top of the dropdown) – creates a new preset from your current settings under a name of your choice.
