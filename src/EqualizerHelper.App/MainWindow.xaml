@@ -9,8 +9,8 @@
         xmlns:dsp="clr-namespace:EqualizerHelper.Dsp;assembly=EqualizerHelper.Dsp"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         mc:Ignorable="d"
-        Title="LocoMic" Height="840" Width="1080"
-        MinHeight="640" MinWidth="900"
+        Title="LocoMic" Height="800" Width="1080"
+        MinHeight="760" MinWidth="900"
         WindowStyle="None"
         Foreground="{DynamicResource TextPrimaryBrush}"
         FontFamily="Segoe UI"
@@ -230,11 +230,16 @@
         <Grid x:Name="PagesHost" Grid.Row="1">
 
             <!-- HOME -->
-            <ScrollViewer x:Name="HomePage" VerticalScrollBarVisibility="Auto">
-                <StackPanel Margin="24,18,24,18" MaxWidth="1400">
+            <Grid x:Name="HomePage" Margin="24,18,24,18" MaxWidth="1400">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-                    <TextBlock Text="CONTROLS" Style="{StaticResource EyebrowStyle}" />
-                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
+                    <TextBlock Grid.Row="0" Text="CONTROLS" Style="{StaticResource EyebrowStyle}" />
+                    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,20">
                         <StackPanel>
                             <!-- Transport + presets -->
                             <Grid>
@@ -589,8 +594,8 @@
                         </StackPanel>
                     </Border>
 
-                    <TextBlock Text="EQUALIZER" Style="{StaticResource EyebrowStyle}" />
-                    <Border Style="{StaticResource CardStyle}">
+                    <TextBlock Grid.Row="2" Text="EQUALIZER" Style="{StaticResource EyebrowStyle}" />
+                    <Border Grid.Row="3" Style="{StaticResource CardStyle}">
                         <ItemsControl ItemsSource="{Binding Bands}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -599,33 +604,41 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,0,0,2" />
-                                        <TextBlock HorizontalAlignment="Center" Margin="0,0,0,12" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"
+                                    <!-- The slider row stretches to fill the card's height. -->
+                                    <Grid HorizontalAlignment="Center">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Text="{Binding Label}" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,0,0,2" />
+                                        <TextBlock Grid.Row="1" HorizontalAlignment="Center" Margin="0,0,0,12" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"
                                                    Text="{Binding FrequencyHz, StringFormat={}{0:0} Hz}" />
 
-                                        <Slider Orientation="Vertical" Height="155" Minimum="-15" Maximum="15"
-                                                Value="{Binding GainDb}" HorizontalAlignment="Center"
+                                        <Slider Grid.Row="2" Orientation="Vertical" MinHeight="90" Minimum="-15" Maximum="15"
+                                                Value="{Binding GainDb}" HorizontalAlignment="Center" VerticalAlignment="Stretch"
                                                 ToolTip="Boost (up) or cut (down) this part of your voice" />
 
-                                        <TextBlock Text="{Binding GainDb, StringFormat={}{0:+0.0;-0.0;0.0} dB}"
+                                        <TextBlock Grid.Row="3" Text="{Binding GainDb, StringFormat={}{0:+0.0;-0.0;0.0} dB}"
                                                    HorizontalAlignment="Center" Margin="0,10,0,10" Foreground="{DynamicResource AccentBrush}" />
 
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8"
+                                        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8"
                                                     ToolTip="Width of the band: lower = wider and gentler, higher = narrower and more precise">
                                             <TextBlock Text="Width" VerticalAlignment="Center" Margin="0,0,6,0" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" />
                                             <TextBox Text="{Binding Q, StringFormat=0.00}" Width="58" />
                                         </StackPanel>
 
-                                        <CheckBox Content="On" IsChecked="{Binding Enabled}" HorizontalAlignment="Center"
+                                        <CheckBox Grid.Row="5" Content="On" IsChecked="{Binding Enabled}" HorizontalAlignment="Center"
                                                   ToolTip="Turn this band on or off" />
-                                    </StackPanel>
+                                    </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </Border>
-                </StackPanel>
-            </ScrollViewer>
+            </Grid>
 
             <!-- SETTINGS -->
             <ScrollViewer x:Name="SettingsPage" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
