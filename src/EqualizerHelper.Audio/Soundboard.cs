@@ -16,7 +16,7 @@ public class SoundboardSettings
     /// <summary>Turn sounds down automatically while the user is talking.</summary>
     public bool DuckWhileTalking { get; set; } = true;
 
-    /// <summary>Also play sounds into the "hear yourself" monitor.</summary>
+    /// <summary>Play sounds to the headphone (monitor) device, even when "hear yourself" is off.</summary>
     public bool HearInMonitor { get; set; } = true;
 
     /// <summary>How far sounds are turned down while talking.</summary>
@@ -205,6 +205,7 @@ public sealed class SoundboardSampleProvider : ISampleProvider
     private readonly int _channels;
     private readonly Func<SoundboardSettings> _getSettings;
     private readonly bool _isMonitor;
+    private readonly Func<bool> _isVoiceAudible;
     private readonly ConcurrentQueue<Action> _commands = new();
     private readonly List<SoundStream> _active = new();
     private readonly Limiter _limiter;
@@ -216,9 +217,14 @@ public sealed class SoundboardSampleProvider : ISampleProvider
     private double _voiceEnvelope;
     private double _duckGain = 1;
 
-    public SoundboardSampleProvider(ISampleProvider source, Func<SoundboardSettings> getSettings, bool isMonitor)
+    /// <param name="isVoiceAudible">
+    /// False to output only the sounds (the voice still drives ducking), e.g.
+    /// for the headphones when "Hear sounds" is on but "Hear yourself" is off.
+    /// </param>
+    public SoundboardSampleProvider(ISampleProvider source, Func<SoundboardSettings> getSettings, bool isMonitor, Func<bool>? isVoiceAudible = null)
     {
         _source = source;
+        _isVoiceAudible = isVoiceAudible ?? (() => true);
         _channels = source.WaveFormat.Channels;
         _getSettings = getSettings;
         _isMonitor = isMonitor;
@@ -264,8 +270,14 @@ public sealed class SoundboardSampleProvider : ISampleProvider
             command();
         }
 
+        bool voiceAudible = _isVoiceAudible();
         if (_active.Count == 0)
         {
+            if (!voiceAudible)
+            {
+                buffer[..samplesRead].Clear();
+            }
+
             return samplesRead;
         }
 
@@ -325,7 +337,7 @@ public sealed class SoundboardSampleProvider : ISampleProvider
             float peak = 0;
             for (int c = 0; c < _channels; c++)
             {
-                buffer[frame + c] += music;
+                buffer[frame + c] = (voiceAudible ? buffer[frame + c] : 0f) + music;
                 peak = Math.Max(peak, Math.Abs(buffer[frame + c]));
             }
 

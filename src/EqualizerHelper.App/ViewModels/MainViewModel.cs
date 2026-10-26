@@ -183,6 +183,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         _engine.Soundboard.Settings.HearInMonitor = value;
         SavePersistedSettings();
+        UpdateMonitorPlayback();
     }
 
     [RelayCommand]
@@ -571,11 +572,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     partial void OnMonitorEnabledChanged(bool value)
     {
+        _engine.MonitorVoiceEnabled = value;
         SavePersistedSettings();
+        UpdateMonitorPlayback();
+    }
 
-        if (IsRunning && !_engine.SetMonitorEnabled(value))
+    private void UpdateMonitorPlayback()
+    {
+        if (IsRunning && !_engine.UpdateMonitorPlayback())
         {
-            StatusMessage = "No monitor device was active when you started — stop and start again to enable live monitoring.";
+            StatusMessage = "No headphones were selected when you started — stop and start again to hear yourself or the sounds.";
         }
     }
 

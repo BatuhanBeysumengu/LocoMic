@@ -182,6 +182,30 @@ public class SoundboardTests : IDisposable
     }
 
     [Fact]
+    public void Monitor_WithVoiceOff_PlaysOnlyTheSounds()
+    {
+        var board = new Soundboard();
+        _boards.Add(board);
+        board.Settings.MasterVolume = 1.0;
+        board.Settings.DuckWhileTalking = false;
+        var mixer = new SoundboardSampleProvider(new ConstantSource(0.2f, channels: 1), () => board.Settings, isMonitor: true, isVoiceAudible: () => false);
+        board.Attach(mixer, isMain: false);
+
+        // No sound playing yet: the voice must not reach the headphones.
+        Assert.Equal(0, Rms(Read(mixer, 0.1)), 6);
+
+        board.Play(Guid.NewGuid(), WriteSine(1.0), () => 1.0, () => false);
+        var output = Read(mixer, 0.5);
+
+        // Only the 0.5-amplitude sine (RMS ~0.354), no 0.2 voice offset on top.
+        double mean = 0;
+        foreach (float sample in output) mean += sample;
+        mean /= output.Length;
+        Assert.InRange(mean, -0.02, 0.02);
+        Assert.InRange(Rms(output), 0.30, 0.40);
+    }
+
+    [Fact]
     public void Play_WithBadFile_ThrowsAndPlaysNothing()
     {
         var (board, mixer) = CreateBoard(new ConstantSource(0, channels: 1));

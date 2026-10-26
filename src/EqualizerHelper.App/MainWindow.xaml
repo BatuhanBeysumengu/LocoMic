@@ -402,11 +402,10 @@
                                     </Grid>
 
                                     <TextBlock Text="LISTEN" Style="{StaticResource GroupHeadingStyle}" Margin="0,6,0,10" />
-                                    <CheckBox Content="Hear yourself through:" IsChecked="{Binding MonitorEnabled}"
+                                    <ComboBox ItemsSource="{Binding RenderDevices}" SelectedItem="{Binding SelectedMonitorDevice}"
+                                              ToolTip="Your headphones. Used by 'Hear yourself' and 'Hear sounds' (use headphones, not speakers, to avoid echo)." />
+                                    <CheckBox Content="Hear yourself" Margin="0,10,0,0" IsChecked="{Binding MonitorEnabled}"
                                               ToolTip="Play your processed voice in your headphones so you can hear your changes" />
-                                    <ComboBox Margin="0,8,0,0" ItemsSource="{Binding RenderDevices}" SelectedItem="{Binding SelectedMonitorDevice}"
-                                              IsEnabled="{Binding MonitorEnabled}"
-                                              ToolTip="Headphones to hear yourself on (use headphones, not speakers, to avoid echo)" />
                                 </StackPanel>
 
                                 <!-- Soundboard -->
@@ -568,7 +567,7 @@
                                             <CheckBox Content="Lower while I talk" IsChecked="{Binding DuckSounds}"
                                                       ToolTip="Automatically turns sounds down while you're talking so people can understand you, and back up when you stop" />
                                             <CheckBox Content="Hear sounds" Margin="16,0,0,0" IsChecked="{Binding HearSounds}"
-                                                      ToolTip="Also play the sounds in your headphones (needs 'Hear yourself' on)" />
+                                                      ToolTip="Play the sounds in your headphones (the device under LISTEN), even when 'Hear yourself' is off" />
                                         </StackPanel>
                                     </StackPanel>
                                 </Grid>

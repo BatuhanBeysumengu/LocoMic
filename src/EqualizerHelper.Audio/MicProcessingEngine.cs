@@ -35,6 +35,14 @@ public class MicProcessingEngine : IDisposable
     public bool Muted { get; set; }
 
     /// <summary>
+    /// Whether the user's own voice goes to the monitor (headphones). The
+    /// monitor also plays when only the soundboard's "hear sounds" is on.
+    /// </summary>
+    public bool MonitorVoiceEnabled { get; set; } = true;
+
+    private bool _monitorPlaying;
+
+    /// <summary>
     /// 1.0 = no pitch change. &lt;1 lowers pitch, &gt;1 raises it. Applied
     /// last in the chain (after the analysis tap), so Auto-Tune's band
     /// analysis always sees the natural-pitch signal regardless of this.
@@ -140,7 +148,7 @@ public class MicProcessingEngine : IDisposable
             }
 
             var monitorOutputDynamics = new OutputDynamicsSampleProvider(monitorCompressor, sampleRate, () => Dynamics, () => Bypass);
-            var monitorSoundboard = new SoundboardSampleProvider(monitorOutputDynamics, () => Soundboard.Settings, isMonitor: true);
+            var monitorSoundboard = new SoundboardSampleProvider(monitorOutputDynamics, () => Soundboard.Settings, isMonitor: true, () => MonitorVoiceEnabled);
             Soundboard.Attach(monitorSoundboard, isMain: false);
             var monitorResampled = new MediaFoundationResampler(new MuteSampleProvider(monitorSoundboard, () => Muted).ToWaveProvider(), monitorMixFormat)
             {
@@ -161,14 +169,9 @@ public class MicProcessingEngine : IDisposable
 
         _capture.StartRecording();
         _mainOutput.Play();
-        if (_monitorOutput != null)
-        {
-            _monitorOutput.Play();
-            if (!monitorEnabled)
-            {
-                _monitorOutput.Pause();
-            }
-        }
+        MonitorVoiceEnabled = monitorEnabled;
+        _monitorPlaying = false;
+        UpdateMonitorPlayback();
 
         IsRunning = true;
     }
@@ -198,17 +201,26 @@ public class MicProcessingEngine : IDisposable
     }
 
     /// <summary>
-    /// Live-toggles whether the monitor device is actually playing, without
-    /// tearing down and rebuilding the pipeline. Returns false (no-op) if no
-    /// monitor device was selected when the engine was started.
+    /// Plays the monitor device while the voice or the soundboard should be
+    /// heard on it, and pauses it otherwise, without rebuilding the pipeline.
+    /// Call after changing <see cref="MonitorVoiceEnabled"/> or the
+    /// soundboard's HearInMonitor. Returns false if the monitor should play
+    /// but no monitor device was selected when the engine was started.
     /// </summary>
-    public bool SetMonitorEnabled(bool enabled)
+    public bool UpdateMonitorPlayback()
     {
+        bool enabled = MonitorVoiceEnabled || Soundboard.Settings.HearInMonitor;
         if (_monitorOutput == null)
         {
-            return false;
+            return !enabled;
         }
 
+        if (enabled == _monitorPlaying)
+        {
+            return true;
+        }
+
+        _monitorPlaying = enabled;
         if (enabled)
         {
             // While paused, capture keeps feeding the monitor buffer in the
