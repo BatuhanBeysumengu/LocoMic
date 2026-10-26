@@ -49,5 +49,8 @@ public class EqPreset
     /// <summary>0..1 noise removal strength (blend with the original).</summary>
     public double NoiseRemovalStrength { get; set; } = 1.0;
 
+    /// <summary>Character effect: robot, radio, telephone, echo, hall (or none).</summary>
+    public VoiceEffectType VoiceEffect { get; set; }
+
     public override string ToString() => Name;
 }

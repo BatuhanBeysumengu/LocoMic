@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:EqualizerHelper.App"
         xmlns:converters="clr-namespace:EqualizerHelper.App.Converters"
         xmlns:controls="clr-namespace:EqualizerHelper.App.Controls"
+        xmlns:dsp="clr-namespace:EqualizerHelper.Dsp;assembly=EqualizerHelper.Dsp"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         mc:Ignorable="d"
         Title="Equalizer Helper" Height="840" Width="1080"
@@ -401,6 +402,23 @@
                                         <TextBlock Grid.Column="2" Style="{StaticResource ValueTextStyle}" Text="{Binding MicCrunch, StringFormat={}{0:P0}}" />
                                     </Grid>
 
+                                    <Grid Style="{StaticResource SliderRowStyle}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="80" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Effect" Style="{StaticResource ControlLabelStyle}" />
+                                        <ComboBox Grid.Column="1" SelectedValue="{Binding VoiceEffect}" SelectedValuePath="Tag"
+                                                  ToolTip="A character effect for your voice. Try the '(Fun)' presets to hear them with matching pitch and EQ.">
+                                            <ComboBoxItem Content="None" Tag="{x:Static dsp:VoiceEffectType.None}" />
+                                            <ComboBoxItem Content="Robot" Tag="{x:Static dsp:VoiceEffectType.Robot}" />
+                                            <ComboBoxItem Content="Radio / walkie-talkie" Tag="{x:Static dsp:VoiceEffectType.Radio}" />
+                                            <ComboBoxItem Content="Telephone" Tag="{x:Static dsp:VoiceEffectType.Telephone}" />
+                                            <ComboBoxItem Content="Echo" Tag="{x:Static dsp:VoiceEffectType.Echo}" />
+                                            <ComboBoxItem Content="Big hall" Tag="{x:Static dsp:VoiceEffectType.Hall}" />
+                                        </ComboBox>
+                                    </Grid>
+
                                     <TextBlock Text="LISTEN" Style="{StaticResource GroupHeadingStyle}" Margin="0,6,0,10" />
                                     <ComboBox ItemsSource="{Binding RenderDevices}" SelectedItem="{Binding SelectedMonitorDevice}"
                                               ToolTip="Your headphones. Used by 'Hear yourself' and 'Hear sounds' (use headphones, not speakers, to avoid echo)." />
@@ -590,7 +608,7 @@
                                         <TextBlock HorizontalAlignment="Center" Margin="0,0,0,12" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11"
                                                    Text="{Binding FrequencyHz, StringFormat={}{0:0} Hz}" />
 
-                                        <Slider Orientation="Vertical" Height="180" Minimum="-15" Maximum="15"
+                                        <Slider Orientation="Vertical" Height="155" Minimum="-15" Maximum="15"
                                                 Value="{Binding GainDb}" HorizontalAlignment="Center"
                                                 ToolTip="Boost (up) or cut (down) this part of your voice" />
 

@@ -55,6 +55,9 @@ public class MicProcessingEngine : IDisposable
     /// </summary>
     public double MicCrunchAmount { get; set; }
 
+    /// <summary>Character effect (robot, radio, echo...) applied after mic crunch.</summary>
+    public VoiceEffectType VoiceEffect { get; set; }
+
     /// <summary>
     /// Input gain + noise gate (start of chain) and loudness compressor +
     /// safety limiter (end of chain). Mutate the properties live.
@@ -119,7 +122,8 @@ public class MicProcessingEngine : IDisposable
             outputMixFormat = client.MixFormat;
         }
 
-        var mainOutputDynamics = new OutputDynamicsSampleProvider(mainCompressor, sampleRate, () => Dynamics, () => Bypass);
+        var mainEffect = new VoiceEffectSampleProvider(mainCompressor, () => VoiceEffect, () => Bypass);
+        var mainOutputDynamics = new OutputDynamicsSampleProvider(mainEffect, sampleRate, () => Dynamics, () => Bypass);
         var mainSoundboard = new SoundboardSampleProvider(mainOutputDynamics, () => Soundboard.Settings, isMonitor: false);
         Soundboard.Attach(mainSoundboard, isMain: true);
         var mainResampled = new MediaFoundationResampler(new MuteSampleProvider(mainSoundboard, () => Muted).ToWaveProvider(), outputMixFormat)
@@ -147,7 +151,8 @@ public class MicProcessingEngine : IDisposable
                 monitorMixFormat = client.MixFormat;
             }
 
-            var monitorOutputDynamics = new OutputDynamicsSampleProvider(monitorCompressor, sampleRate, () => Dynamics, () => Bypass);
+            var monitorEffect = new VoiceEffectSampleProvider(monitorCompressor, () => VoiceEffect, () => Bypass);
+            var monitorOutputDynamics = new OutputDynamicsSampleProvider(monitorEffect, sampleRate, () => Dynamics, () => Bypass);
             var monitorSoundboard = new SoundboardSampleProvider(monitorOutputDynamics, () => Soundboard.Settings, isMonitor: true, () => MonitorVoiceEnabled);
             Soundboard.Attach(monitorSoundboard, isMain: false);
             var monitorResampled = new MediaFoundationResampler(new MuteSampleProvider(monitorSoundboard, () => Muted).ToWaveProvider(), monitorMixFormat)

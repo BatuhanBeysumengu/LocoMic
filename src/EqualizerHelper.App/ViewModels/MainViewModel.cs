@@ -12,6 +12,7 @@ using EqualizerHelper.App.Presets;
 using EqualizerHelper.App.Services;
 using EqualizerHelper.App.Views;
 using EqualizerHelper.Audio;
+using EqualizerHelper.Dsp;
 
 namespace EqualizerHelper.App.ViewModels;
 
@@ -421,6 +422,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private double inputGainDb;
 
+    public static VoiceEffectType[] VoiceEffects { get; } = Enum.GetValues<VoiceEffectType>();
+
+    [ObservableProperty]
+    private VoiceEffectType voiceEffect;
+
+    partial void OnVoiceEffectChanged(VoiceEffectType value) => _engine.VoiceEffect = value;
+
     [ObservableProperty]
     private double gate;
 
@@ -648,6 +656,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Loudness = preset.Loudness;
         NoiseRemoval = preset.NoiseRemoval;
         NoiseRemovalStrength = preset.NoiseRemovalStrength;
+        VoiceEffect = preset.VoiceEffect;
     }
 
     [RelayCommand]
@@ -1008,6 +1017,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             Loudness = Loudness,
             NoiseRemoval = NoiseRemoval,
             NoiseRemovalStrength = NoiseRemovalStrength,
+            VoiceEffect = VoiceEffect,
         };
     }
 
@@ -1046,6 +1056,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         to.Loudness = from.Loudness;
         to.NoiseRemoval = from.NoiseRemoval;
         to.NoiseRemovalStrength = from.NoiseRemovalStrength;
+        to.VoiceEffect = from.VoiceEffect;
     }
 
     private void NotifyPresetActionsChanged()

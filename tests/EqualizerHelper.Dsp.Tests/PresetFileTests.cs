@@ -15,6 +15,7 @@ public class PresetFileTests
         preset.MicCrunch = 0.25;
         preset.InputGainDb = 6;
         preset.NoiseRemovalStrength = 0.7;
+        preset.VoiceEffect = VoiceEffectType.Robot;
         return preset;
     }
 
@@ -35,6 +36,7 @@ public class PresetFileTests
         Assert.Equal(original.Loudness, loaded.Loudness);
         Assert.Equal(original.NoiseRemoval, loaded.NoiseRemoval);
         Assert.Equal(original.NoiseRemovalStrength, loaded.NoiseRemovalStrength);
+        Assert.Equal(VoiceEffectType.Robot, loaded.VoiceEffect);
     }
 
     [Fact]

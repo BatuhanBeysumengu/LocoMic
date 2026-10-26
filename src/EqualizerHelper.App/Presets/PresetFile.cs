@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using EqualizerHelper.Dsp;
 
 namespace EqualizerHelper.App.Presets;
 
@@ -121,6 +122,7 @@ public static class PresetFile
             Loudness = Clamp(preset.Loudness, 0, 1, 0),
             NoiseRemoval = preset.NoiseRemoval,
             NoiseRemovalStrength = Clamp(preset.NoiseRemovalStrength, 0, 1, 1),
+            VoiceEffect = Enum.IsDefined(preset.VoiceEffect) ? preset.VoiceEffect : VoiceEffectType.None,
         };
     }
 

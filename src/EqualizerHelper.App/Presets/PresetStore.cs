@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using EqualizerHelper.Dsp;
 
 namespace EqualizerHelper.App.Presets;
 
@@ -30,7 +31,23 @@ public static class PresetStore
             // headroom; 0.6 crunch is noticeably distorted without becoming
             // unintelligible noise.
             BuildPreset("Deep Bass (Fun)", -8, 0.6, 10, 6, 2, -5, -8, -12),
+            // More fun voices. The character mostly comes from the effect;
+            // pitch, crunch and EQ (Rumble, Mud, Body, Presence, Sibilance, Air)
+            // finish the sound.
+            WithEffect(BuildPreset("Robot (Fun)", -2, 0.15, 0, 0, 0, 2, 0, 0), VoiceEffectType.Robot),
+            WithEffect(BuildPreset("Radio (Fun)", 0, 0.35, -15, -3, 4, 6, -3, -15), VoiceEffectType.Radio),
+            WithEffect(BuildPreset("Telephone (Fun)", 0, 0.1, -15, -4, 3, 4, -6, -15), VoiceEffectType.Telephone),
+            WithEffect(BuildPreset("Echo (Fun)", 0, 0, 0, -2, 0, 2, 0, 0), VoiceEffectType.Echo),
+            WithEffect(BuildPreset("Big Hall (Fun)", 0, 0, -2, -2, 0, 2, 0, 2), VoiceEffectType.Hall),
+            BuildPreset("Chipmunk (Fun)", 8, 0, -6, -3, 0, 2, 0, 3),
+            BuildPreset("Monster (Fun)", -10, 0.45, 8, 4, 0, -3, -6, -10),
         };
+    }
+
+    private static EqPreset WithEffect(EqPreset preset, VoiceEffectType effect)
+    {
+        preset.VoiceEffect = effect;
+        return preset;
     }
 
     private static EqPreset WithDynamics(EqPreset preset, double gate, double loudness, bool noiseRemoval = false)
