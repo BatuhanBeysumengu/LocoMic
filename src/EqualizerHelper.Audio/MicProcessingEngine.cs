@@ -59,6 +59,9 @@ public class MicProcessingEngine : IDisposable
     /// <summary>0..1 blend between the original (0) and fully denoised (1) signal.</summary>
     public double NoiseRemovalStrength { get; set; } = 1.0;
 
+    /// <summary>Songs and sound effects mixed into the processed mic.</summary>
+    public Soundboard Soundboard { get; } = new();
+
     public bool IsRunning { get; private set; }
     public float InputLevel => _inputMeter?.CurrentLevel ?? 0f;
     public float OutputLevel => _outputMeter?.CurrentLevel ?? 0f;
@@ -109,7 +112,9 @@ public class MicProcessingEngine : IDisposable
         }
 
         var mainOutputDynamics = new OutputDynamicsSampleProvider(mainCompressor, sampleRate, () => Dynamics, () => Bypass);
-        var mainResampled = new MediaFoundationResampler(new MuteSampleProvider(mainOutputDynamics, () => Muted).ToWaveProvider(), outputMixFormat)
+        var mainSoundboard = new SoundboardSampleProvider(mainOutputDynamics, () => Soundboard.Settings, isMonitor: false);
+        Soundboard.Attach(mainSoundboard, isMain: true);
+        var mainResampled = new MediaFoundationResampler(new MuteSampleProvider(mainSoundboard, () => Muted).ToWaveProvider(), outputMixFormat)
         {
             ResamplerQuality = 60,
         };
@@ -135,7 +140,9 @@ public class MicProcessingEngine : IDisposable
             }
 
             var monitorOutputDynamics = new OutputDynamicsSampleProvider(monitorCompressor, sampleRate, () => Dynamics, () => Bypass);
-            var monitorResampled = new MediaFoundationResampler(new MuteSampleProvider(monitorOutputDynamics, () => Muted).ToWaveProvider(), monitorMixFormat)
+            var monitorSoundboard = new SoundboardSampleProvider(monitorOutputDynamics, () => Soundboard.Settings, isMonitor: true);
+            Soundboard.Attach(monitorSoundboard, isMain: false);
+            var monitorResampled = new MediaFoundationResampler(new MuteSampleProvider(monitorSoundboard, () => Muted).ToWaveProvider(), monitorMixFormat)
             {
                 ResamplerQuality = 60,
             };
@@ -258,6 +265,7 @@ public class MicProcessingEngine : IDisposable
         }
 
         // Only after both outputs have stopped pulling audio.
+        Soundboard.DetachAll();
         _mainNoiseRemoval?.Dispose();
         _monitorNoiseRemoval?.Dispose();
         _mainNoiseRemoval = null;

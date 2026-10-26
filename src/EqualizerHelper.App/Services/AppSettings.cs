@@ -15,4 +15,18 @@ public class AppSettings
     /// disables that hotkey. Missing actions fall back to the defaults.
     /// </summary>
     public Dictionary<string, string>? Hotkeys { get; set; }
+
+    /// <summary>The soundboard list (files stay where they are on disk).</summary>
+    public List<SavedSound>? Sounds { get; set; }
+
+    public double SoundVolume { get; set; } = 0.6;
+    public bool DuckSounds { get; set; } = true;
+    public bool HearSounds { get; set; } = true;
+}
+
+public class SavedSound
+{
+    public string Path { get; set; } = string.Empty;
+    public double Volume { get; set; } = 1.0;
+    public bool Loop { get; set; }
 }

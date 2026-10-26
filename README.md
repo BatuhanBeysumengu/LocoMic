@@ -21,6 +21,7 @@ A Windows desktop app that cleans up (or messes with) your microphone in real ti
   - **Gain** – boost or lower a quiet/loud mic before processing.
   - **Gate** – turns the mic down when you're not talking, hiding keyboard, fan and room noise.
   - **Loudness** – evens out your volume and makes your voice fuller (compressor), with an always-on limiter so the output never clips.
+- **Soundboard** – add songs or sound effects (MP3, WAV, M4A, WMA, FLAC…) and play them into your mic while you talk. Each sound has its own volume and a loop option; a master volume, **Lower while I talk** (automatic ducking) and **Hear sounds** (play them in your headphones too) control the mix.
 - **Pitch shift** – raise or lower your voice in semitones.
 - **Mic Crunch** – distortion + compression for an overdriven-mic effect.
 - **Presets** – built-in presets (Flat, Voice Clarity, De-Boom, De-Harsh Sibilance, Deep Bass (Fun)), plus as many presets of your own as you like. Every preset (built-in ones too) can be tweaked and saved, and each one stores the EQ, noise removal, dynamics, pitch and Mic Crunch.
@@ -69,6 +70,7 @@ Everything you use day to day is on the main screen. Devices, hotkeys, startup a
 4. **Shape your sound:**
    - **Clean-up:** tick **AI noise removal** if there's background noise. Raise **Gain** if the *Input* meter barely moves, raise **Gate** until noise disappears between words, and add **Loudness** for a fuller, more even voice.
    - **Voice:** change **Pitch** or add **Crunch** for fun.
+   - **Sounds:** click **+ Add** to add songs or sound effects, then press ▶ to play one into your mic (■ stops it). Tick ⟲ to loop background music, and keep **Lower while I talk** on so people can still understand you. Sounds only play while the app is started.
    - **Equalizer:** drag the bands to fine-tune your sound, or press **Auto-Tune Voice**, talk for a few seconds, then click **Keep** or **Revert** at the bottom.
 5. **Presets** (top-right of the main screen):
    - **+ New preset...** (top of the dropdown) – creates a new preset from your current settings under a name of your choice.
@@ -110,7 +112,7 @@ tests/
   EqualizerHelper.Dsp.Tests/   Unit tests for the DSP library, noise removal and preset files
 ```
 
-Signal chain: `Mic → Noise removal → Gain → Gate → EQ → Pitch shift → Mic Crunch → Loudness → Limiter → Output (virtual cable)`, with an optional parallel copy to your headphones for monitoring.
+Signal chain: `Mic → Noise removal → Gain → Gate → EQ → Pitch shift → Mic Crunch → Loudness → Limiter → + Soundboard (ducked, limited) → Output (virtual cable)`, with an optional parallel copy to your headphones for monitoring.
 
 ## Running the tests
 

@@ -36,6 +36,20 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var savedSettings = AppSettingsStore.Load();
         Hotkeys = HotkeyGesture.FromSettings(savedSettings.Hotkeys);
 
+        Sounds = new ObservableCollection<SoundItemViewModel>();
+        foreach (var saved in savedSettings.Sounds ?? new List<SavedSound>())
+        {
+            AddSoundItem(new SoundItemViewModel(saved.Path, saved.Volume, saved.Loop));
+        }
+
+        soundVolume = savedSettings.SoundVolume;
+        duckSounds = savedSettings.DuckSounds;
+        hearSounds = savedSettings.HearSounds;
+        _engine.Soundboard.Settings.MasterVolume = soundVolume;
+        _engine.Soundboard.Settings.DuckWhileTalking = duckSounds;
+        _engine.Soundboard.Settings.HearInMonitor = hearSounds;
+        _engine.Soundboard.SoundEnded += OnSoundEnded;
+
         SelectedCaptureDevice = CaptureDevices.FirstOrDefault(d => d.Id == savedSettings.CaptureDeviceId)
             ?? CaptureDevices.FirstOrDefault();
         SelectedRenderDevice = RenderDevices.FirstOrDefault(d => d.Id == savedSettings.RenderDeviceId)
@@ -120,6 +134,161 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     private bool isMuted;
+
+    /// <summary>Songs and sound effects the user can play into the mic.</summary>
+    public ObservableCollection<SoundItemViewModel> Sounds { get; }
+
+    [ObservableProperty]
+    private double soundVolume;
+
+    [ObservableProperty]
+    private bool duckSounds;
+
+    [ObservableProperty]
+    private bool hearSounds;
+
+    partial void OnSoundVolumeChanged(double value)
+    {
+        _engine.Soundboard.Settings.MasterVolume = value;
+        SavePersistedSettings();
+    }
+
+    partial void OnDuckSoundsChanged(bool value)
+    {
+        _engine.Soundboard.Settings.DuckWhileTalking = value;
+        SavePersistedSettings();
+    }
+
+    partial void OnHearSoundsChanged(bool value)
+    {
+        _engine.Soundboard.Settings.HearInMonitor = value;
+        SavePersistedSettings();
+    }
+
+    [RelayCommand]
+    private void AddSounds()
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "Add sounds",
+            Filter = "Audio files (*.mp3;*.wav;*.m4a;*.aac;*.wma;*.flac;*.aiff)|*.mp3;*.wav;*.m4a;*.aac;*.wma;*.flac;*.aiff;*.aif|All files (*.*)|*.*",
+            Multiselect = true,
+        };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        foreach (string path in dialog.FileNames)
+        {
+            if (Sounds.Any(s => string.Equals(s.Path, path, StringComparison.OrdinalIgnoreCase)))
+            {
+                continue;
+            }
+
+            AddSoundItem(new SoundItemViewModel(path));
+        }
+
+        SavePersistedSettings();
+        StatusMessage = IsRunning
+            ? "Sound added. Press ▶ to play it into your mic."
+            : "Sound added. Press Start, then ▶ to play it into your mic.";
+    }
+
+    [RelayCommand]
+    private void ToggleSound(SoundItemViewModel? sound)
+    {
+        if (sound == null)
+        {
+            return;
+        }
+
+        if (sound.IsPlaying)
+        {
+            _engine.Soundboard.Stop(sound.Id);
+            sound.IsPlaying = false;
+            return;
+        }
+
+        if (!_engine.Soundboard.IsAvailable)
+        {
+            StatusMessage = "Press Start first, then play sounds into your mic.";
+            return;
+        }
+
+        if (!sound.FileExists)
+        {
+            StatusMessage = $"Can't find \"{sound.Name}\" any more. It may have been moved or deleted.";
+            return;
+        }
+
+        try
+        {
+            _engine.Soundboard.Play(sound.Id, sound.Path, () => sound.Volume, () => sound.Loop);
+            sound.IsPlaying = true;
+            StatusMessage = $"Playing \"{sound.Name}\" into your mic.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Couldn't play \"{sound.Name}\": {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveSound(SoundItemViewModel? sound)
+    {
+        if (sound == null)
+        {
+            return;
+        }
+
+        _engine.Soundboard.Stop(sound.Id);
+        sound.Changed -= OnSoundChanged;
+        Sounds.Remove(sound);
+        SavePersistedSettings();
+    }
+
+    [RelayCommand]
+    private void StopAllSounds()
+    {
+        _engine.Soundboard.StopAll();
+        foreach (var sound in Sounds)
+        {
+            sound.IsPlaying = false;
+        }
+    }
+
+    partial void OnIsRunningChanged(bool value)
+    {
+        // Stopping the engine (or losing a device) stops every sound with it.
+        if (!value)
+        {
+            foreach (var sound in Sounds)
+            {
+                sound.IsPlaying = false;
+            }
+        }
+    }
+
+    private void AddSoundItem(SoundItemViewModel sound)
+    {
+        sound.Changed += OnSoundChanged;
+        Sounds.Add(sound);
+    }
+
+    private void OnSoundChanged(object? sender, EventArgs e) => SavePersistedSettings();
+
+    private void OnSoundEnded(object? sender, Guid id)
+    {
+        System.Windows.Application.Current?.Dispatcher.BeginInvoke(() =>
+        {
+            var sound = Sounds.FirstOrDefault(s => s.Id == id);
+            if (sound != null)
+            {
+                sound.IsPlaying = false;
+            }
+        });
+    }
 
     /// <summary>One-line summary of the current hotkeys for the Settings page.</summary>
     public string HotkeySummary
@@ -324,6 +493,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
             MonitorEnabled = MonitorEnabled,
             PresetName = SelectedPreset?.Name,
             Hotkeys = HotkeyGesture.ToSettings(Hotkeys),
+            Sounds = Sounds.Select(s => new SavedSound { Path = s.Path, Volume = s.Volume, Loop = s.Loop }).ToList(),
+            SoundVolume = SoundVolume,
+            DuckSounds = DuckSounds,
+            HearSounds = HearSounds,
         });
     }
 

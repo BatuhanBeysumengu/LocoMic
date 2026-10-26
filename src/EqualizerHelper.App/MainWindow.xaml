@@ -95,6 +95,57 @@
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         </Style>
 
+        <converters:ZeroToVisibleConverter x:Key="ZeroToVisibleConverter" />
+
+        <!-- Small square icon button (play/stop, remove). -->
+        <Style x:Key="IconButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="26" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="Transparent" CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource ControlBorderBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Icon that lights up when on (used for Loop). Content is the icon glyph. -->
+        <Style x:Key="IconToggleStyle" TargetType="CheckBox">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Border x:Name="Bd" Background="Transparent" CornerRadius="5" Width="26" Height="26">
+                            <TextBlock x:Name="Glyph" Text="{TemplateBinding Content}" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="12"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource TextMutedBrush}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource ControlBorderBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Glyph" Property="Foreground" Value="{StaticResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SmallButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Padding" Value="8,3" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+
         <!-- One slider row: label | slider | value. -->
         <Style x:Key="SliderRowStyle" TargetType="Grid">
             <Setter Property="Margin" Value="0,0,0,12" />
@@ -250,11 +301,13 @@
 
                             <Border Height="1" Background="{StaticResource PanelBorderBrush}" Margin="0,18,0,16" />
 
-                            <!-- Sound controls, two columns -->
+                            <!-- Sound controls, three columns -->
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="40" />
+                                    <ColumnDefinition Width="32" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="32" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
@@ -349,17 +402,148 @@
                                     </Grid>
 
                                     <TextBlock Text="LISTEN" Style="{StaticResource GroupHeadingStyle}" Margin="0,6,0,10" />
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <CheckBox Content="Hear yourself via" IsChecked="{Binding MonitorEnabled}"
-                                                  ToolTip="Play your processed voice in your headphones so you can hear your changes" />
-                                        <ComboBox Grid.Column="1" Margin="10,0,0,0" ItemsSource="{Binding RenderDevices}" SelectedItem="{Binding SelectedMonitorDevice}"
-                                                  ToolTip="Headphones to hear yourself on (use headphones, not speakers, to avoid echo)" />
-                                    </Grid>
+                                    <CheckBox Content="Hear yourself through:" IsChecked="{Binding MonitorEnabled}"
+                                              ToolTip="Play your processed voice in your headphones so you can hear your changes" />
+                                    <ComboBox Margin="0,8,0,0" ItemsSource="{Binding RenderDevices}" SelectedItem="{Binding SelectedMonitorDevice}"
+                                              IsEnabled="{Binding MonitorEnabled}"
+                                              ToolTip="Headphones to hear yourself on (use headphones, not speakers, to avoid echo)" />
                                 </StackPanel>
+
+                                <!-- Soundboard -->
+                                <Grid Grid.Column="4">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="SOUNDS" Style="{StaticResource GroupHeadingStyle}" />
+                                        <Button Grid.Column="1" Style="{StaticResource SmallButtonStyle}" Content="Stop all" Margin="0,-6,6,0"
+                                                Command="{Binding StopAllSoundsCommand}"
+                                                ToolTip="Stop every sound that's playing" />
+                                        <Button Grid.Column="2" Style="{StaticResource SmallButtonStyle}" Content="+ Add" Margin="0,-6,0,0"
+                                                Command="{Binding AddSoundsCommand}"
+                                                ToolTip="Add songs or sound effects (MP3, WAV, M4A, WMA, FLAC...) to play into your mic" />
+                                    </Grid>
+
+                                    <Border Grid.Row="1" Background="{StaticResource ControlBackgroundBrush}" CornerRadius="8" Height="116" Margin="0,0,0,10">
+                                        <Grid>
+                                            <TextBlock Text="Add songs or sound effects with '+ Add', then press ▶ to play them into your mic while you talk."
+                                                       Style="{StaticResource HelpTextStyle}" Margin="12,0" VerticalAlignment="Center" TextAlignment="Center">
+                                                <TextBlock.Visibility>
+                                                    <Binding Path="Sounds.Count" Converter="{StaticResource ZeroToVisibleConverter}" />
+                                                </TextBlock.Visibility>
+                                            </TextBlock>
+                                            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4">
+                                                <ItemsControl ItemsSource="{Binding Sounds}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Grid Margin="0,1">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                    <ColumnDefinition Width="*" />
+                                                                    <ColumnDefinition Width="60" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <Button Grid.Column="0" Style="{StaticResource IconButtonStyle}"
+                                                                        Command="{Binding DataContext.ToggleSoundCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                        CommandParameter="{Binding}">
+                                                                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="12">
+                                                                        <TextBlock.Style>
+                                                                            <Style TargetType="TextBlock">
+                                                                                <Setter Property="Text" Value="&#xE768;" />
+                                                                                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                                                                                <Style.Triggers>
+                                                                                    <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                                                                        <Setter Property="Text" Value="&#xE71A;" />
+                                                                                        <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                                                                                    </DataTrigger>
+                                                                                </Style.Triggers>
+                                                                            </Style>
+                                                                        </TextBlock.Style>
+                                                                    </TextBlock>
+                                                                    <Button.ToolTip>
+                                                                        <TextBlock>
+                                                                            <TextBlock.Style>
+                                                                                <Style TargetType="TextBlock">
+                                                                                    <Setter Property="Text" Value="Play this sound into your mic" />
+                                                                                    <Style.Triggers>
+                                                                                        <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                                                                            <Setter Property="Text" Value="Stop this sound" />
+                                                                                        </DataTrigger>
+                                                                                    </Style.Triggers>
+                                                                                </Style>
+                                                                            </TextBlock.Style>
+                                                                        </TextBlock>
+                                                                    </Button.ToolTip>
+                                                                </Button>
+
+                                                                <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" Margin="6,0,8,0"
+                                                                           TextTrimming="CharacterEllipsis" ToolTip="{Binding Path}">
+                                                                    <TextBlock.Style>
+                                                                        <Style TargetType="TextBlock">
+                                                                            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                                                                            <Style.Triggers>
+                                                                                <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                                                                    <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                                                                                </DataTrigger>
+                                                                            </Style.Triggers>
+                                                                        </Style>
+                                                                    </TextBlock.Style>
+                                                                </TextBlock>
+
+                                                                <Slider Grid.Column="2" Style="{StaticResource HorizontalSliderStyle}" Minimum="0" Maximum="1"
+                                                                        Value="{Binding Volume}" VerticalAlignment="Center"
+                                                                        ToolTip="Volume of this sound" />
+
+                                                                <CheckBox Grid.Column="3" Style="{StaticResource IconToggleStyle}" Content="&#xE8EE;" Margin="6,0,0,0"
+                                                                          IsChecked="{Binding Loop}"
+                                                                          ToolTip="Loop: play this sound over and over (good for background music)" />
+
+                                                                <Button Grid.Column="4" Style="{StaticResource IconButtonStyle}"
+                                                                        Command="{Binding DataContext.RemoveSoundCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                        CommandParameter="{Binding}"
+                                                                        ToolTip="Remove from the list (the file itself is not deleted)">
+                                                                    <TextBlock Text="&#xE711;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="10"
+                                                                               Foreground="{StaticResource TextSecondaryBrush}" />
+                                                                </Button>
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </ScrollViewer>
+                                        </Grid>
+                                    </Border>
+
+                                    <StackPanel Grid.Row="2">
+                                        <Grid Style="{StaticResource SliderRowStyle}" Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="56" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="Volume" Style="{StaticResource ControlLabelStyle}" />
+                                            <Slider Grid.Column="1" Style="{StaticResource HorizontalSliderStyle}" Minimum="0" Maximum="1"
+                                                    Value="{Binding SoundVolume}" VerticalAlignment="Center"
+                                                    ToolTip="Volume of all sounds compared to your voice" />
+                                            <TextBlock Grid.Column="2" Style="{StaticResource ValueTextStyle}" Text="{Binding SoundVolume, StringFormat={}{0:P0}}" />
+                                        </Grid>
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox Content="Lower while I talk" IsChecked="{Binding DuckSounds}"
+                                                      ToolTip="Automatically turns sounds down while you're talking so people can understand you, and back up when you stop" />
+                                            <CheckBox Content="Hear sounds" Margin="16,0,0,0" IsChecked="{Binding HearSounds}"
+                                                      ToolTip="Also play the sounds in your headphones (needs 'Hear yourself' on)" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
                             </Grid>
                         </StackPanel>
                     </Border>
