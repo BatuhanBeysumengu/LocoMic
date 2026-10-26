@@ -25,8 +25,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = _viewModel;
 
-        // Window/taskbar icon from the multi-size app icon (the tray keeps the
-        // transparent glyph from AppIconFactory, which reads better there).
+        // Window/taskbar icon from the multi-size app icon (also used for the tray).
         Icon = BitmapFrame.Create(new Uri("pack://application:,,,/Assets/app.ico"));
 
         _trayIcon = new TrayIconService(_viewModel);
