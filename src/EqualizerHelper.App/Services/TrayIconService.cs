@@ -45,7 +45,7 @@ public class TrayIconService : IDisposable
 
         _notifyIcon = new NotifyIcon
         {
-            Icon = AppIconFactory.CreateIcon(),
+            Icon = ThemeService.CreateTrayIcon(),
             Visible = true,
             ContextMenuStrip = menu,
             Text = "LocoMic",
@@ -53,7 +53,15 @@ public class TrayIconService : IDisposable
         _notifyIcon.DoubleClick += (_, _) => ShowRequested?.Invoke(this, EventArgs.Empty);
 
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
+        ThemeService.ThemeChanged += OnThemeChanged;
         UpdateStatus();
+    }
+
+    private void OnThemeChanged(object? sender, EventArgs e)
+    {
+        var old = _notifyIcon.Icon;
+        _notifyIcon.Icon = ThemeService.CreateTrayIcon();
+        old?.Dispose();
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -85,6 +93,7 @@ public class TrayIconService : IDisposable
     public void Dispose()
     {
         _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+        ThemeService.ThemeChanged -= OnThemeChanged;
         _notifyIcon.Visible = false;
         _notifyIcon.Dispose();
     }

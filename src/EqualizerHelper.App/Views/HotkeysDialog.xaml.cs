@@ -19,6 +19,7 @@ public partial class HotkeysDialog : Window
     {
         InitializeComponent();
         DarkTitleBar.ApplyWhenReady(this);
+        Icon = ThemeService.WindowIcon;
         _hotkeys = current.ToDictionary(kv => kv.Key, kv => kv.Value);
 
         var first = new HotkeyGesture(HotkeyGesture.PresetNumberModifiers, Key.D1);

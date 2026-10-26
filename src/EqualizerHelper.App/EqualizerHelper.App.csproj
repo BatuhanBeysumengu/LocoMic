@@ -23,9 +23,4 @@
     <Version>1.0.0</Version>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Resource Include="Assets\app.ico" />
-    <Resource Include="Assets\logo-64.png" />
-  </ItemGroup>
-
 </Project>

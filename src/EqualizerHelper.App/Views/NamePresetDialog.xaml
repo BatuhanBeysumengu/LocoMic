@@ -3,8 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Save Preset" SizeToContent="Height" Width="360"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
-        ShowInTaskbar="False" Style="{StaticResource DialogWindowStyle}"
-        Icon="pack://application:,,,/LocoMic;component/Assets/app.ico">
+        ShowInTaskbar="False" Style="{StaticResource DialogWindowStyle}">
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

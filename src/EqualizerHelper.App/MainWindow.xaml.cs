@@ -25,8 +25,10 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = _viewModel;
 
-        // Window/taskbar icon from the multi-size app icon (also used for the tray).
-        Icon = BitmapFrame.Create(new Uri("pack://application:,,,/LocoMic;component/Assets/app.ico"));
+        // Window/taskbar icon and header logo in the current theme's colours.
+        Icon = ThemeService.WindowIcon;
+        HeaderLogo.Source = ThemeService.HeaderLogo;
+        ThemeService.ThemeChanged += OnThemeChanged;
 
         _trayIcon = new TrayIconService(_viewModel);
         _trayIcon.ShowRequested += (_, _) => RestoreFromTray();
@@ -139,8 +141,11 @@ public partial class MainWindow : Window
         base.OnClosing(e);
     }
 
+    private void OnThemeChanged(object? sender, EventArgs e) => HeaderLogo.Source = ThemeService.HeaderLogo;
+
     private void MainWindow_OnClosed(object? sender, EventArgs e)
     {
+        ThemeService.ThemeChanged -= OnThemeChanged;
         _hotkeys?.Dispose();
         _trayIcon.Dispose();
         _viewModel.Dispose();

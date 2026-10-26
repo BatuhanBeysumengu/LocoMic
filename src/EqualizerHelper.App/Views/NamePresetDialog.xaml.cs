@@ -19,6 +19,7 @@ public partial class NamePresetDialog : Window
     {
         InitializeComponent();
         DarkTitleBar.ApplyWhenReady(this);
+        Icon = ThemeService.WindowIcon;
         _validate = validate;
 
         if (prompt != null)
