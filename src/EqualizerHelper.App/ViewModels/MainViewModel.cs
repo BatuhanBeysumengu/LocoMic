@@ -47,6 +47,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         duckSounds = savedSettings.DuckSounds;
         hearSounds = savedSettings.HearSounds;
         soundHotkeysEnabled = savedSettings.SoundHotkeysEnabled;
+        selectedTheme = ThemeService.Find(savedSettings.Theme);
         _engine.Soundboard.Settings.MasterVolume = soundVolume;
         _engine.Soundboard.Settings.DuckWhileTalking = duckSounds;
         _engine.Soundboard.Settings.HearInMonitor = hearSounds;
@@ -152,6 +153,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     private bool soundHotkeysEnabled;
+
+    public IReadOnlyList<AppTheme> Themes => ThemeService.Themes;
+
+    [ObservableProperty]
+    private AppTheme selectedTheme;
+
+    partial void OnSelectedThemeChanged(AppTheme value)
+    {
+        ThemeService.Apply(value);
+        SavePersistedSettings();
+    }
 
     partial void OnSoundHotkeysEnabledChanged(bool value)
     {
@@ -614,6 +626,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             DuckSounds = DuckSounds,
             HearSounds = HearSounds,
             SoundHotkeysEnabled = SoundHotkeysEnabled,
+            Theme = SelectedTheme.Name,
         });
     }
 

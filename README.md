@@ -29,6 +29,7 @@ A Windows desktop app that cleans up (or messes with) your microphone in real ti
 - **Share presets** – export any preset to a `.eqpreset` file and import presets other people send you.
 - **Bypass** – instantly compare processed vs. original sound.
 - **Mute** – silence your mic instantly (also from the tray menu).
+- **Themes** – Locomotive (orange on black, the default), Mint, Ocean, Grape or Cherry, under **☰ → Settings → Theme**.
 - **Global hotkeys** – work everywhere, even in-game or with the app in the tray (customizable under **☰ → Settings**):
 
   | Action                  | Default            |

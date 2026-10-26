@@ -22,6 +22,7 @@ public partial class App : System.Windows.Application
 
         // Bring over presets/settings saved under the app's old name.
         Services.AppPaths.MigrateLegacyData();
+        Services.ThemeService.Apply(Services.ThemeService.Find(Services.AppSettingsStore.Load().Theme));
 
         _singleInstanceMutex = new Mutex(true, SingleInstanceMutexName, out bool createdNew);
         if (!createdNew)

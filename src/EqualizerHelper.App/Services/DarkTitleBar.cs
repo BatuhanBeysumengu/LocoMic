@@ -13,7 +13,6 @@ public static class DarkTitleBar
 {
     private const int DwmwaUseImmersiveDarkMode = 20;
     private const int DwmwaBorderColor = 34;
-    private const int DarkPanelColorRef = 0x00201D1B; // COLORREF (0x00BBGGRR) for #1B1D20
 
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attribute, ref int value, int valueSize);
@@ -29,7 +28,9 @@ public static class DarkTitleBar
         int darkMode = 1;
         DwmSetWindowAttribute(hwnd, DwmwaUseImmersiveDarkMode, ref darkMode, sizeof(int));
 
-        int borderColor = DarkPanelColorRef;
+        // Border in the current theme's panel colour, as a COLORREF (0x00BBGGRR).
+        var panel = ThemeService.Current.Panel;
+        int borderColor = panel.R | (panel.G << 8) | (panel.B << 16);
         DwmSetWindowAttribute(hwnd, DwmwaBorderColor, ref borderColor, sizeof(int));
     }
 

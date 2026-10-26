@@ -25,6 +25,9 @@ public class AppSettings
 
     /// <summary>Soundboard hotkeys (numpad by default), active only while started.</summary>
     public bool SoundHotkeysEnabled { get; set; } = true;
+
+    /// <summary>Colour theme name (see ThemeService); null means the default.</summary>
+    public string? Theme { get; set; }
 }
 
 public class SavedSound

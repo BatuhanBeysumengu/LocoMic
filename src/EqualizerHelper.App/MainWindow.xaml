@@ -12,7 +12,7 @@
         Title="LocoMic" Height="840" Width="1080"
         MinHeight="640" MinWidth="900"
         WindowStyle="None"
-        Foreground="{StaticResource TextPrimaryBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
         FontFamily="Segoe UI"
         ToolTipService.InitialShowDelay="350"
         ToolTipService.ShowDuration="20000"
@@ -27,8 +27,8 @@
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 
         <Style x:Key="CardStyle" TargetType="Border">
-            <Setter Property="Background" Value="{StaticResource PanelBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource PanelBorderBrush}" />
+            <Setter Property="Background" Value="{DynamicResource PanelBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource PanelBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="12" />
             <Setter Property="Padding" Value="20" />
@@ -36,7 +36,7 @@
 
         <!-- Small all-caps heading above a card, as in the original layout. -->
         <Style x:Key="EyebrowStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
             <Setter Property="FontSize" Value="11" />
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="Margin" Value="4,0,0,8" />
@@ -44,34 +44,34 @@
 
         <!-- Subtle heading for a group of controls inside a card. -->
         <Style x:Key="GroupHeadingStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
             <Setter Property="FontSize" Value="11" />
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="Margin" Value="0,0,0,10" />
         </Style>
 
         <Style x:Key="SectionLabelStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Margin" Value="0,0,8,0" />
         </Style>
 
         <Style x:Key="ControlLabelStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="13" />
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
 
         <Style x:Key="ValueTextStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="13" />
-            <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="HorizontalAlignment" Value="Right" />
         </Style>
 
         <Style x:Key="HelpTextStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="12" />
-            <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="Margin" Value="0,4,0,0" />
         </Style>
@@ -79,13 +79,13 @@
         <Style x:Key="PageTitleStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="22" />
             <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
             <Setter Property="Margin" Value="0,0,0,4" />
         </Style>
 
         <Style x:Key="PageSubtitleStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="13" />
-            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="Margin" Value="0,0,0,20" />
         </Style>
@@ -93,7 +93,7 @@
         <Style x:Key="CardTitleStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="15" />
             <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         </Style>
 
         <converters:ZeroToVisibleConverter x:Key="ZeroToVisibleConverter" />
@@ -111,7 +111,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource ControlBorderBrush}" />
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ControlBorderBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -127,14 +127,14 @@
                     <ControlTemplate TargetType="CheckBox">
                         <Border x:Name="Bd" Background="Transparent" CornerRadius="5" Width="26" Height="26">
                             <TextBlock x:Name="Glyph" Text="{TemplateBinding Content}" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="12"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource TextMutedBrush}" />
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource ControlBorderBrush}" />
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ControlBorderBrush}" />
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Glyph" Property="Foreground" Value="{StaticResource AccentBrush}" />
+                                <Setter TargetName="Glyph" Property="Foreground" Value="{DynamicResource AccentBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -158,7 +158,7 @@
         </Style>
     </Window.Resources>
 
-    <Grid Background="{StaticResource WindowBackgroundBrush}">
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="40" />
             <RowDefinition Height="*" />
@@ -166,7 +166,7 @@
         </Grid.RowDefinitions>
 
         <!-- Title bar: menu, app name, window buttons -->
-        <Grid Grid.Row="0" Background="{StaticResource PanelBrush}">
+        <Grid Grid.Row="0" Background="{DynamicResource PanelBrush}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -205,7 +205,7 @@
                        RenderOptions.BitmapScalingMode="HighQuality" />
                 <TextBlock Text="LocoMic" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" />
                 <TextBlock x:Name="PageNameText" Text="" FontSize="12" Margin="8,0,0,0" VerticalAlignment="Center"
-                           Foreground="{StaticResource TextSecondaryBrush}" />
+                           Foreground="{DynamicResource TextSecondaryBrush}" />
             </StackPanel>
 
             <StackPanel Grid.Column="2" Orientation="Horizontal" shell:WindowChrome.IsHitTestVisibleInChrome="True">
@@ -296,7 +296,7 @@
                                         ToolTip="Delete your own preset, or reset a built-in preset you changed back to its original settings" />
                             </Grid>
 
-                            <Border Height="1" Background="{StaticResource PanelBorderBrush}" Margin="0,18,0,16" />
+                            <Border Height="1" Background="{DynamicResource PanelBorderBrush}" Margin="0,18,0,16" />
 
                             <!-- Sound controls, three columns -->
                             <Grid>
@@ -445,7 +445,7 @@
                                                 ToolTip="Add songs or sound effects (MP3, WAV, M4A, WMA, FLAC...) to play into your mic" />
                                     </Grid>
 
-                                    <Border Grid.Row="1" Background="{StaticResource ControlBackgroundBrush}" CornerRadius="8" Height="116" Margin="0,0,0,10">
+                                    <Border Grid.Row="1" Background="{DynamicResource ControlBackgroundBrush}" CornerRadius="8" Height="116" Margin="0,0,0,10">
                                         <Grid>
                                             <TextBlock Text="Add songs or sound effects with '+ Add', then press ▶ (or numpad 1–9) to play them into your mic while you talk."
                                                        Style="{StaticResource HelpTextStyle}" Margin="12,0" VerticalAlignment="Center" TextAlignment="Center">
@@ -466,7 +466,7 @@
                                                                     <Style.Triggers>
                                                                         <!-- Drop indicator: an accent line where the dragged sound will land. -->
                                                                         <Trigger Property="Tag" Value="DropTarget">
-                                                                            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                                                            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
                                                                         </Trigger>
                                                                     </Style.Triggers>
                                                                 </Style>
@@ -488,7 +488,7 @@
                                                                 </Grid.ColumnDefinitions>
 
                                                                 <TextBlock Grid.Column="0" Text="{Binding Number}" FontSize="11" VerticalAlignment="Center"
-                                                                           HorizontalAlignment="Center" Foreground="{StaticResource TextMutedBrush}" Cursor="SizeAll"
+                                                                           HorizontalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" Cursor="SizeAll"
                                                                            MouseLeftButtonDown="SoundDrag_MouseDown" MouseMove="SoundDrag_MouseMove"
                                                                            ToolTip="Numpad key for this sound (while started). Drag to another row to change its number, or right-click to move it." />
                                                                 <Button Grid.Column="1" Style="{StaticResource IconButtonStyle}"
@@ -498,11 +498,11 @@
                                                                         <TextBlock.Style>
                                                                             <Style TargetType="TextBlock">
                                                                                 <Setter Property="Text" Value="&#xE768;" />
-                                                                                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                                                                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
                                                                                 <Style.Triggers>
                                                                                     <DataTrigger Binding="{Binding IsPlaying}" Value="True">
                                                                                         <Setter Property="Text" Value="&#xE71A;" />
-                                                                                        <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                                                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
                                                                                     </DataTrigger>
                                                                                 </Style.Triggers>
                                                                             </Style>
@@ -530,10 +530,10 @@
                                                                            ToolTip="{Binding Path, StringFormat={}{0}&#x0a;Drag to reorder (the number is its numpad key); right-click to move.}">
                                                                     <TextBlock.Style>
                                                                         <Style TargetType="TextBlock">
-                                                                            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                                                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
                                                                             <Style.Triggers>
                                                                                 <DataTrigger Binding="{Binding IsPlaying}" Value="True">
-                                                                                    <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                                                                                    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
                                                                                 </DataTrigger>
                                                                             </Style.Triggers>
                                                                         </Style>
@@ -553,7 +553,7 @@
                                                                         CommandParameter="{Binding}"
                                                                         ToolTip="Remove from the list (the file itself is not deleted)">
                                                                     <TextBlock Text="&#xE711;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="10"
-                                                                               Foreground="{StaticResource TextSecondaryBrush}" />
+                                                                               Foreground="{DynamicResource TextSecondaryBrush}" />
                                                                 </Button>
                                                             </Grid>
                                                             </Border>
@@ -601,7 +601,7 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                                         <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,0,0,2" />
-                                        <TextBlock HorizontalAlignment="Center" Margin="0,0,0,12" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11"
+                                        <TextBlock HorizontalAlignment="Center" Margin="0,0,0,12" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"
                                                    Text="{Binding FrequencyHz, StringFormat={}{0:0} Hz}" />
 
                                         <Slider Orientation="Vertical" Height="155" Minimum="-15" Maximum="15"
@@ -609,11 +609,11 @@
                                                 ToolTip="Boost (up) or cut (down) this part of your voice" />
 
                                         <TextBlock Text="{Binding GainDb, StringFormat={}{0:+0.0;-0.0;0.0} dB}"
-                                                   HorizontalAlignment="Center" Margin="0,10,0,10" Foreground="{StaticResource AccentBrush}" />
+                                                   HorizontalAlignment="Center" Margin="0,10,0,10" Foreground="{DynamicResource AccentBrush}" />
 
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8"
                                                     ToolTip="Width of the band: lower = wider and gentler, higher = narrower and more precise">
-                                            <TextBlock Text="Width" VerticalAlignment="Center" Margin="0,0,6,0" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
+                                            <TextBlock Text="Width" VerticalAlignment="Center" Margin="0,0,6,0" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" />
                                             <TextBox Text="{Binding Q, StringFormat=0.00}" Width="58" />
                                         </StackPanel>
 
@@ -683,6 +683,56 @@
                             </StackPanel>
                         </Border>
 
+                        <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16" controls:ResponsiveColumnsPanel.FullWidth="True">
+                            <StackPanel>
+                                <TextBlock Text="Theme" Style="{StaticResource CardTitleStyle}" />
+                                <TextBlock Style="{StaticResource HelpTextStyle}" Margin="0,4,0,12"
+                                           Text="Pick a colour theme. It changes the whole app straight away." />
+                                <ListBox ItemsSource="{Binding Themes}" SelectedItem="{Binding SelectedTheme}"
+                                         Background="Transparent" BorderThickness="0" Padding="0"
+                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel />
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="Cursor" Value="Hand" />
+                                            <Setter Property="Margin" Value="0,0,10,10" />
+                                            <Setter Property="ToolTip" Value="{Binding Description}" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ListBoxItem">
+                                                        <Border x:Name="Bd" Width="150" Padding="12,10" CornerRadius="10" BorderThickness="2"
+                                                                Background="{Binding PanelBrush}" BorderBrush="{DynamicResource ControlBorderBrush}">
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <Ellipse Width="22" Height="22" Fill="{Binding AccentBrush}" VerticalAlignment="Center" />
+                                                                <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="White" />
+                                                                    <TextBlock x:Name="Check" Text="Selected" FontSize="11"
+                                                                               Foreground="{Binding AccentBrush}" Visibility="Collapsed" />
+                                                                </StackPanel>
+                                                            </StackPanel>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource TextMutedBrush}" />
+                                                            </Trigger>
+                                                            <Trigger Property="IsSelected" Value="True">
+                                                                <Setter TargetName="Bd" Property="BorderBrush" Value="{Binding AccentBrush}" />
+                                                                <Setter TargetName="Check" Property="Visibility" Value="Visible" />
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                </ListBox>
+                            </StackPanel>
+                        </Border>
+
                         <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
                             <StackPanel>
                                 <TextBlock Text="Startup" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,12" />
@@ -711,8 +761,8 @@
         </Grid>
 
         <!-- Status strip: meters, messages, auto-tune Keep/Revert -->
-        <Border Grid.Row="2" Background="{StaticResource PanelBrush}"
-                BorderBrush="{StaticResource PanelBorderBrush}" BorderThickness="0,1,0,0" Padding="24,10">
+        <Border Grid.Row="2" Background="{DynamicResource PanelBrush}"
+                BorderBrush="{DynamicResource PanelBorderBrush}" BorderThickness="0,1,0,0" Padding="24,10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -735,7 +785,7 @@
                              ToolTip="The processed level going to your output device (what Discord/OBS hear)" />
 
                 <TextBlock Grid.Column="4" Text="{Binding StatusMessage}" VerticalAlignment="Center" TextWrapping="Wrap"
-                           FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="20,0,12,0" />
+                           FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="20,0,12,0" />
 
                 <Button Grid.Column="5" Content="Get VB-Audio Virtual Cable"
                         Command="{Binding OpenVirtualCableDownloadPageCommand}"
