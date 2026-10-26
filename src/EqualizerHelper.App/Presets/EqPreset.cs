@@ -43,5 +43,11 @@ public class EqPreset
     /// <summary>0..1 loudness (voice compression) amount. 0 = off.</summary>
     public double Loudness { get; set; }
 
+    /// <summary>AI (RNNoise) background-noise removal on/off.</summary>
+    public bool NoiseRemoval { get; set; }
+
+    /// <summary>0..1 noise removal strength (blend with the original).</summary>
+    public double NoiseRemovalStrength { get; set; } = 1.0;
+
     public override string ToString() => Name;
 }

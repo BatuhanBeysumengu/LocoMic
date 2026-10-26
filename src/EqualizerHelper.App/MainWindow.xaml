@@ -7,8 +7,8 @@
         xmlns:converters="clr-namespace:EqualizerHelper.App.Converters"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         mc:Ignorable="d"
-        Title="Equalizer Helper" Height="800" Width="1040"
-        MinHeight="720" MinWidth="900"
+        Title="Equalizer Helper" Height="840" Width="1040"
+        MinHeight="760" MinWidth="900"
         WindowStyle="None"
         Closed="MainWindow_OnClosed">
     <shell:WindowChrome.WindowChrome>
@@ -229,6 +229,28 @@
                         <TextBlock Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center"
                                    Foreground="{StaticResource AccentBrush}" Width="70">
                             <Run Text="{Binding MicCrunch, StringFormat={}{0:P0}}" />
+                        </TextBlock>
+                    </Grid>
+
+                    <!-- AI noise removal (RNNoise) -->
+                    <Grid Margin="0,16,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="260" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox Grid.Column="0" Content="AI noise removal" VerticalAlignment="Center"
+                                  IsChecked="{Binding NoiseRemoval}"
+                                  ToolTip="Removes background noise (fans, keyboard, traffic, hum) even while you talk, using the RNNoise neural network. Runs on your CPU." />
+                        <TextBlock Grid.Column="1" Text="Strength:" Margin="16,0,0,0" Style="{StaticResource SectionLabelStyle}"
+                                   IsEnabled="{Binding NoiseRemoval}" />
+                        <Slider Grid.Column="2" Style="{StaticResource HorizontalSliderStyle}" Minimum="0" Maximum="1"
+                                Value="{Binding NoiseRemovalStrength}" VerticalAlignment="Center" IsEnabled="{Binding NoiseRemoval}" />
+                        <TextBlock Grid.Column="3" Margin="10,0,0,0" VerticalAlignment="Center"
+                                   Foreground="{StaticResource AccentBrush}" Width="70">
+                            <Run Text="{Binding NoiseRemovalStrength, StringFormat={}{0:P0}}" />
                         </TextBlock>
                     </Grid>
 

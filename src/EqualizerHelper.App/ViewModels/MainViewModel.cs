@@ -163,6 +163,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private double loudness;
 
+    [ObservableProperty]
+    private bool noiseRemoval;
+
+    [ObservableProperty]
+    private double noiseRemovalStrength = 1.0;
+
     partial void OnStartWithWindowsChanged(bool value)
     {
         StartupRegistration.SetEnabled(value);
@@ -187,6 +193,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     partial void OnLoudnessChanged(double value) => _engine.Dynamics.Loudness = value;
+
+    partial void OnNoiseRemovalChanged(bool value) => _engine.NoiseRemovalEnabled = value;
+
+    partial void OnNoiseRemovalStrengthChanged(double value) => _engine.NoiseRemovalStrength = value;
 
     public string GateDisplay => Gate <= 0 ? "Off" : $"{DynamicsSettings.GateThresholdDb(Gate):0} dB";
 
@@ -338,6 +348,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         InputGainDb = preset.InputGainDb;
         Gate = preset.Gate;
         Loudness = preset.Loudness;
+        NoiseRemoval = preset.NoiseRemoval;
+        NoiseRemovalStrength = preset.NoiseRemovalStrength;
     }
 
     [RelayCommand]
@@ -605,6 +617,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             InputGainDb = InputGainDb,
             Gate = Gate,
             Loudness = Loudness,
+            NoiseRemoval = NoiseRemoval,
+            NoiseRemovalStrength = NoiseRemovalStrength,
         };
     }
 
@@ -641,6 +655,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         to.InputGainDb = from.InputGainDb;
         to.Gate = from.Gate;
         to.Loudness = from.Loudness;
+        to.NoiseRemoval = from.NoiseRemoval;
+        to.NoiseRemovalStrength = from.NoiseRemovalStrength;
     }
 
     private void NotifyPresetActionsChanged()

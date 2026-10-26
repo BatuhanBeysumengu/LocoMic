@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using EqualizerHelper.Dsp;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace EqualizerHelper.Audio;
 
@@ -25,6 +26,8 @@ public class MicProcessingEngine : IDisposable
     private LevelMeteringSampleProvider? _inputMeter;
     private LevelMeteringSampleProvider? _outputMeter;
     private AnalysisTapSampleProvider? _analysisTap;
+    private NoiseRemovalSampleProvider? _mainNoiseRemoval;
+    private NoiseRemovalSampleProvider? _monitorNoiseRemoval;
 
     public bool Bypass { get; set; }
 
@@ -49,6 +52,12 @@ public class MicProcessingEngine : IDisposable
     /// safety limiter (end of chain). Mutate the properties live.
     /// </summary>
     public DynamicsSettings Dynamics { get; } = new();
+
+    /// <summary>AI (RNNoise) background-noise removal, applied first in the chain.</summary>
+    public bool NoiseRemovalEnabled { get; set; }
+
+    /// <summary>0..1 blend between the original (0) and fully denoised (1) signal.</summary>
+    public double NoiseRemovalStrength { get; set; } = 1.0;
 
     public bool IsRunning { get; private set; }
     public float InputLevel => _inputMeter?.CurrentLevel ?? 0f;
@@ -75,12 +84,16 @@ public class MicProcessingEngine : IDisposable
         _capture = new WasapiCapture(micDevice);
         WaveFormat captureFormat = _capture.WaveFormat;
         int channels = captureFormat.Channels;
-        double sampleRate = captureFormat.SampleRate;
+
+        // The whole chain runs at 48 kHz because RNNoise requires it; mics
+        // running at another rate are resampled once, up front.
+        const int sampleRate = NoiseRemovalSampleProvider.RequiredSampleRate;
         SampleRate = sampleRate;
 
         _mainBuffer = new BufferedWaveProvider(captureFormat) { DiscardOnBufferOverflow = true };
         var mainChain = new EqChain(bands, channels, sampleRate);
-        var mainInputDynamics = new InputDynamicsSampleProvider(_mainBuffer.ToSampleProvider(), sampleRate, () => Dynamics, () => Bypass);
+        _mainNoiseRemoval = new NoiseRemovalSampleProvider(To48k(_mainBuffer), () => NoiseRemovalEnabled && !Bypass, () => NoiseRemovalStrength);
+        var mainInputDynamics = new InputDynamicsSampleProvider(_mainNoiseRemoval, sampleRate, () => Dynamics, () => Bypass);
         _inputMeter = new LevelMeteringSampleProvider(mainInputDynamics);
         var mainEq = new EqSampleProvider(_inputMeter, mainChain, () => Bypass);
         _outputMeter = new LevelMeteringSampleProvider(mainEq);
@@ -108,7 +121,8 @@ public class MicProcessingEngine : IDisposable
         {
             _monitorBuffer = new BufferedWaveProvider(captureFormat) { DiscardOnBufferOverflow = true };
             var monitorChain = new EqChain(bands, channels, sampleRate);
-            var monitorInputDynamics = new InputDynamicsSampleProvider(_monitorBuffer.ToSampleProvider(), sampleRate, () => Dynamics, () => Bypass);
+            _monitorNoiseRemoval = new NoiseRemovalSampleProvider(To48k(_monitorBuffer), () => NoiseRemovalEnabled && !Bypass, () => NoiseRemovalStrength);
+            var monitorInputDynamics = new InputDynamicsSampleProvider(_monitorNoiseRemoval, sampleRate, () => Dynamics, () => Bypass);
             var monitorEq = new EqSampleProvider(monitorInputDynamics, monitorChain, () => Bypass);
             var monitorPitch = new PitchShiftSampleProvider(monitorEq, () => PitchRatio);
             var monitorDistortion = new DistortionSampleProvider(monitorPitch, () => MicCrunchAmount);
@@ -150,6 +164,14 @@ public class MicProcessingEngine : IDisposable
         }
 
         IsRunning = true;
+    }
+
+    private static ISampleProvider To48k(BufferedWaveProvider buffer)
+    {
+        var samples = buffer.ToSampleProvider();
+        return samples.WaveFormat.SampleRate == NoiseRemovalSampleProvider.RequiredSampleRate
+            ? samples
+            : new WdlResamplingSampleProvider(samples, NoiseRemovalSampleProvider.RequiredSampleRate);
     }
 
     /// <summary>
@@ -234,6 +256,12 @@ public class MicProcessingEngine : IDisposable
             _monitorOutput.Dispose();
             _monitorOutput = null;
         }
+
+        // Only after both outputs have stopped pulling audio.
+        _mainNoiseRemoval?.Dispose();
+        _monitorNoiseRemoval?.Dispose();
+        _mainNoiseRemoval = null;
+        _monitorNoiseRemoval = null;
 
         _mainBuffer = null;
         _monitorBuffer = null;

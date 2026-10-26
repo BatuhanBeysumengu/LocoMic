@@ -192,6 +192,9 @@
     </Style>
 
     <Style TargetType="ComboBox">
+        <!-- Typing a letter while a dropdown has focus would otherwise jump to the first
+             matching item, e.g. switch preset or audio device just by pressing "a". -->
+        <Setter Property="IsTextSearchEnabled" Value="False" />
         <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource ControlBorderBrush}" />
