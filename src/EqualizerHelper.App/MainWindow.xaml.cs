@@ -26,7 +26,7 @@ public partial class MainWindow : Window
         DataContext = _viewModel;
 
         // Window/taskbar icon from the multi-size app icon (also used for the tray).
-        Icon = BitmapFrame.Create(new Uri("pack://application:,,,/Assets/app.ico"));
+        Icon = BitmapFrame.Create(new Uri("pack://application:,,,/EqualizerHelper;component/Assets/app.ico"));
 
         _trayIcon = new TrayIconService(_viewModel);
         _trayIcon.ShowRequested += (_, _) => RestoreFromTray();

@@ -12,7 +12,7 @@ public static class AppIconFactory
 {
     public static Icon CreateIcon()
     {
-        var resource = System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/Assets/app.ico"))
+        var resource = System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/EqualizerHelper;component/Assets/app.ico"))
             ?? throw new InvalidOperationException("The app icon resource is missing.");
         using var stream = resource.Stream;
         return new Icon(stream, System.Windows.Forms.SystemInformation.SmallIconSize);
