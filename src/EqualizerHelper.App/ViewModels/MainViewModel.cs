@@ -88,6 +88,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         _engine.DeviceStoppedUnexpectedly += OnEngineDeviceStoppedUnexpectedly;
 
+        StartupRegistration.RepairIfMoved();
         startWithWindows = StartupRegistration.IsEnabled;
     }
 

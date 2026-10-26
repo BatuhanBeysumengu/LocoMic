@@ -53,6 +53,10 @@ A Windows desktop app that cleans up (or messes with) your microphone in real ti
 - [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) (to build) or .NET 9 Desktop Runtime (to run a build)
 - [VB-Audio Virtual Cable](https://vb-audio.com/Cable/) (free) – needed so other apps can receive the processed mic. The app detects whether it's installed and links to the download if not.
 
+## Download
+
+Grab `EqualizerHelper-<version>-win-x64.zip` from the [Releases](https://github.com/BatuhanBeysumengu/Equalizer/releases) page, unzip it and run `EqualizerHelper.exe`. It's a single self-contained file, so there's nothing to install (you still need [VB-Audio Virtual Cable](https://vb-audio.com/Cable/)). The exe isn't code-signed yet, so Windows SmartScreen may warn the first time: click **More info → Run anyway**.
+
 ## Getting started
 
 ```bash
@@ -118,6 +122,14 @@ tests/
 ```
 
 Signal chain: `Mic → Noise removal → Gain → Gate → EQ → Pitch shift → Mic Crunch → Voice effect → Loudness → Limiter → + Soundboard (ducked, limited) → Output (virtual cable)`, with an optional parallel copy to your headphones for monitoring.
+
+## Building a release
+
+```bash
+dotnet publish src/EqualizerHelper.App -p:PublishProfile=win-x64
+```
+
+This produces a single self-contained `EqualizerHelper.exe` (no .NET install needed, RNNoise bundled) in `src/EqualizerHelper.App/bin/publish/win-x64/`.
 
 ## Running the tests
 
