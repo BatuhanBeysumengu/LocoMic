@@ -132,30 +132,29 @@ public partial class MainWindow : Window
         WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
     }
 
-    /// <summary>
-    /// Sidebar navigation: each nav RadioButton carries the x:Name of its page
-    /// in CommandParameter (Tag holds its icon glyph); show that page only.
-    /// </summary>
-    private void Nav_Checked(object sender, RoutedEventArgs e)
+    private void MenuButton_Click(object sender, RoutedEventArgs e)
     {
-        // Fires once during InitializeComponent for the default (Home) item,
-        // before the pages exist; Home is already the visible page then.
-        if (PagesHost == null || sender is not System.Windows.Controls.RadioButton { CommandParameter: string pageName })
+        // Open the Home/Settings menu on a normal left click, under the button.
+        if (MenuButton.ContextMenu is { } menu)
         {
-            return;
-        }
-
-        foreach (UIElement page in PagesHost.Children)
-        {
-            page.Visibility = page is FrameworkElement element && element.Name == pageName
-                ? Visibility.Visible
-                : Visibility.Collapsed;
+            menu.PlacementTarget = MenuButton;
+            menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+            menu.IsOpen = true;
         }
     }
 
-    private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
+    private void ShowHome_Click(object sender, RoutedEventArgs e) => ShowPage(HomePage, string.Empty);
+
+    private void ShowSettings_Click(object sender, RoutedEventArgs e) => ShowPage(SettingsPage, "· Settings");
+
+    private void ShowPage(UIElement page, string pageName)
     {
-        _viewModel.IsSidebarExpanded = !_viewModel.IsSidebarExpanded;
+        foreach (UIElement child in PagesHost.Children)
+        {
+            child.Visibility = child == page ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        PageNameText.Text = pageName;
     }
 
     private void Close_Click(object sender, RoutedEventArgs e)

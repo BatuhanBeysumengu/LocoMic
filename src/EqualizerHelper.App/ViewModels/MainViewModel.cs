@@ -121,10 +121,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private bool isMuted;
 
-    /// <summary>Whether the sidebar shows labels (true) or only icons.</summary>
-    [ObservableProperty]
-    private bool isSidebarExpanded = true;
-
     /// <summary>One-line summary of the current hotkeys for the Settings page.</summary>
     public string HotkeySummary
     {
