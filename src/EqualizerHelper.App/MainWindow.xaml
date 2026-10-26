@@ -153,6 +153,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <Button Grid.Column="0" Padding="20,9" Command="{Binding ToggleStartStopCommand}">
@@ -196,6 +197,15 @@
                         <Button Grid.Column="7" Content="{Binding DeleteButtonText}" Padding="12,8" Margin="8,0,0,0"
                                 Command="{Binding DeletePresetCommand}"
                                 ToolTip="Delete your preset, or reset an edited built-in preset to its original settings" />
+                        <Button Grid.Column="8" Content="⋯" Padding="12,8" Margin="8,0,0,0" Click="PresetMenu_Click"
+                                ToolTip="Import or export presets">
+                            <Button.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Import presets..." Command="{Binding ImportPresetsCommand}" />
+                                    <MenuItem Header="Export this preset..." Command="{Binding ExportPresetCommand}" />
+                                </ContextMenu>
+                            </Button.ContextMenu>
+                        </Button>
                     </Grid>
 
                     <!-- Pitch (fun voice effect) -->

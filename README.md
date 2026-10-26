@@ -24,6 +24,7 @@ A Windows desktop app that cleans up (or messes with) your microphone in real ti
 - **Pitch shift** – raise or lower your voice in semitones.
 - **Mic Crunch** – distortion + compression for an overdriven-mic effect.
 - **Presets** – built-in presets (Flat, Voice Clarity, De-Boom, De-Harsh Sibilance, Deep Bass (Fun)), plus as many presets of your own as you like. Every preset (built-in ones too) can be tweaked and saved, and each one stores the EQ, noise removal, dynamics, pitch and Mic Crunch.
+- **Share presets** – export any preset to a `.eqpreset` file and import presets other people send you.
 - **Bypass** – instantly compare processed vs. original sound.
 - **Mute** – silence your mic instantly (also from the tray menu).
 - **Global hotkeys** – work everywhere, even in-game or with the app in the tray (customizable under **Hotkeys...**):
@@ -70,6 +71,8 @@ Or open `EqualizerHelper.sln` in Visual Studio 2022 and press F5.
    - **+ New preset...** (top of the dropdown) – creates a new preset from your current settings under a name of your choice.
    - **Save** – stores your changes into the selected preset.
    - **Delete** – removes one of your own presets. For a built-in preset you've changed, this button becomes **Reset** and restores its original settings.
+   - **⋯ → Export this preset...** – saves the current settings to a `.eqpreset` file you can share.
+   - **⋯ → Import presets...** – adds presets from one or more `.eqpreset` files. If a name is already taken, the import gets a number added (e.g. "My Voice (2)") instead of overwriting.
 8. **In Discord / OBS / Zoom**, set the input/microphone device to `CABLE Output (VB-Audio Virtual Cable)`.
 
 Closing the window keeps the app in the system tray; use the tray menu to show it, start/stop processing, or exit.
@@ -102,7 +105,7 @@ src/
   EqualizerHelper.App/     WPF app: main window, view models, presets, settings,
                            auto-tune, tray icon, startup registration
 tests/
-  EqualizerHelper.Dsp.Tests/   Unit tests for the DSP library and noise removal
+  EqualizerHelper.Dsp.Tests/   Unit tests for the DSP library, noise removal and preset files
 ```
 
 Signal chain: `Mic → Noise removal → Gain → Gate → EQ → Pitch shift → Mic Crunch → Loudness → Limiter → Output (virtual cable)`, with an optional parallel copy to your headphones for monitoring.

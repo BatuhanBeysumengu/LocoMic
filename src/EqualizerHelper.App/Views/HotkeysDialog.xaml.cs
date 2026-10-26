@@ -18,6 +18,7 @@ public partial class HotkeysDialog : Window
     public HotkeysDialog(IReadOnlyDictionary<HotkeyAction, HotkeyGesture?> current)
     {
         InitializeComponent();
+        DarkTitleBar.ApplyWhenReady(this);
         _hotkeys = current.ToDictionary(kv => kv.Key, kv => kv.Value);
 
         var first = new HotkeyGesture(HotkeyGesture.PresetNumberModifiers, Key.D1);

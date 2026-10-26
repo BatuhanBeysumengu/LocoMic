@@ -561,6 +561,97 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
+    /// <summary>
+    /// Saves the current settings (under the selected preset's name) to a
+    /// .eqpreset file that can be shared and imported elsewhere.
+    /// </summary>
+    [RelayCommand]
+    private void ExportPreset()
+    {
+        var selected = SelectedPreset;
+        if (selected == null || selected == NewPresetItem)
+        {
+            return;
+        }
+
+        var dialog = new Microsoft.Win32.SaveFileDialog
+        {
+            Title = "Export preset",
+            Filter = PresetFile.DialogFilter,
+            DefaultExt = PresetFile.Extension,
+            FileName = PresetFile.SuggestedFileName(selected.Name),
+        };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        try
+        {
+            PresetFile.Write(dialog.FileName, CreatePresetFromCurrentSettings(selected.Name));
+            StatusMessage = $"Exported \"{selected.Name}\" to {System.IO.Path.GetFileName(dialog.FileName)}.";
+        }
+        catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException)
+        {
+            StatusMessage = $"Couldn't export the preset: {ex.Message}";
+        }
+    }
+
+    /// <summary>
+    /// Imports one or more .eqpreset files as user presets. Names that are
+    /// already taken get a " (2)" style suffix rather than overwriting.
+    /// </summary>
+    [RelayCommand]
+    private void ImportPresets()
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "Import presets",
+            Filter = PresetFile.DialogFilter,
+            Multiselect = true,
+        };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        var imported = new List<string>();
+        var failed = new List<string>();
+        EqPreset? last = null;
+
+        foreach (string path in dialog.FileNames)
+        {
+            try
+            {
+                foreach (var preset in PresetFile.Read(path))
+                {
+                    var existingNames = Presets.Where(p => p != NewPresetItem).Select(p => p.Name).Append(NewPresetItem.Name);
+                    preset.Name = PresetFile.MakeUniqueName(preset.Name, existingNames);
+                    PresetStore.SaveUserPreset(preset);
+                    Presets.Add(preset);
+                    imported.Add(preset.Name);
+                    last = preset;
+                }
+            }
+            catch (Exception ex) when (ex is System.IO.InvalidDataException or System.IO.IOException or UnauthorizedAccessException)
+            {
+                failed.Add($"{System.IO.Path.GetFileName(path)} ({ex.Message})");
+            }
+        }
+
+        if (last != null)
+        {
+            SelectedPreset = last;
+        }
+
+        StatusMessage = (imported.Count, failed.Count) switch
+        {
+            (> 0, 0) => $"Imported {string.Join(", ", imported.Select(n => $"\"{n}\""))}.",
+            (> 0, _) => $"Imported {imported.Count} preset(s). Couldn't import: {string.Join("; ", failed)}",
+            _ => $"Couldn't import: {string.Join("; ", failed)}",
+        };
+    }
+
     public bool IsUserPresetSelected =>
         SelectedPreset != null && SelectedPreset != NewPresetItem && !PresetStore.IsBuiltInName(SelectedPreset.Name);
 

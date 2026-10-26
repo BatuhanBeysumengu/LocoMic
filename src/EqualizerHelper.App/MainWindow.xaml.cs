@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -16,13 +15,6 @@ namespace EqualizerHelper.App;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private const int DwmwaUseImmersiveDarkMode = 20;
-    private const int DwmwaBorderColor = 34;
-    private const int DarkPanelColorRef = 0x00201D1B; // COLORREF (0x00BBGGRR) for #1B1D20
-
-    [DllImport("dwmapi.dll")]
-    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attribute, ref int value, int valueSize);
-
     private readonly MainViewModel _viewModel = new();
     private readonly TrayIconService _trayIcon;
     private GlobalHotkeyService? _hotkeys;
@@ -53,11 +45,7 @@ public partial class MainWindow : Window
         base.OnSourceInitialized(e);
 
         IntPtr hwnd = new WindowInteropHelper(this).Handle;
-        int darkMode = 1;
-        DwmSetWindowAttribute(hwnd, DwmwaUseImmersiveDarkMode, ref darkMode, sizeof(int));
-
-        int borderColor = DarkPanelColorRef;
-        DwmSetWindowAttribute(hwnd, DwmwaBorderColor, ref borderColor, sizeof(int));
+        DarkTitleBar.Apply(this);
 
         _hotkeys = new GlobalHotkeyService(hwnd);
         RegisterHotkeys();
@@ -142,6 +130,18 @@ public partial class MainWindow : Window
     private void MaximizeRestore_Click(object sender, RoutedEventArgs e)
     {
         WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+    }
+
+    private void PresetMenu_Click(object sender, RoutedEventArgs e)
+    {
+        // Open the import/export menu on a normal left click, under the button.
+        if (sender is FrameworkElement { ContextMenu: { } menu } button)
+        {
+            menu.PlacementTarget = button;
+            menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+            menu.DataContext = DataContext;
+            menu.IsOpen = true;
+        }
     }
 
     private void Close_Click(object sender, RoutedEventArgs e)

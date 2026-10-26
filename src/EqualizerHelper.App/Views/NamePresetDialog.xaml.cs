@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using EqualizerHelper.App.Services;
 
 namespace EqualizerHelper.App.Views;
 
@@ -17,6 +18,7 @@ public partial class NamePresetDialog : Window
         Func<string, string?>? validate = null)
     {
         InitializeComponent();
+        DarkTitleBar.ApplyWhenReady(this);
         _validate = validate;
 
         if (prompt != null)

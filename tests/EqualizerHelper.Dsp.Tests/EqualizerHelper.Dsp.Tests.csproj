@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\EqualizerHelper.Dsp\EqualizerHelper.Dsp.csproj" />
     <ProjectReference Include="..\..\src\EqualizerHelper.Audio\EqualizerHelper.Audio.csproj" />
+    <ProjectReference Include="..\..\src\EqualizerHelper.App\EqualizerHelper.App.csproj" />
   </ItemGroup>
 
 </Project>

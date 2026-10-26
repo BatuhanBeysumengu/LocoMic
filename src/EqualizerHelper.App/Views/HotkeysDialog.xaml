@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Hotkeys" SizeToContent="Height" Width="440"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
-        ShowInTaskbar="False">
+        ShowInTaskbar="False" Style="{StaticResource DialogWindowStyle}">
     <StackPanel Margin="16">
         <TextBlock TextWrapping="Wrap" Margin="0,0,0,12"
                    Text="These work anywhere in Windows, even while you're in a game or the app is in the tray. Click a box and press the keys you want (use Ctrl, Alt, Shift or Win plus a key)." />
