@@ -27,7 +27,7 @@ A Windows desktop app that cleans up (or messes with) your microphone in real ti
 - **Share presets** – export any preset to a `.eqpreset` file and import presets other people send you.
 - **Bypass** – instantly compare processed vs. original sound.
 - **Mute** – silence your mic instantly (also from the tray menu).
-- **Global hotkeys** – work everywhere, even in-game or with the app in the tray (customizable under **Hotkeys...**):
+- **Global hotkeys** – work everywhere, even in-game or with the app in the tray (customizable on the **Settings** page):
 
   | Action                  | Default            |
   |-------------------------|--------------------|
@@ -59,20 +59,22 @@ Or open `EqualizerHelper.sln` in Visual Studio 2022 and press F5.
 
 ## How to use
 
+The app has a menu on the left (click **☰** in the top-left corner to collapse it to icons). Hover over any button, checkbox or slider for a short explanation.
+
 1. **Install VB-Audio Virtual Cable** and restart if prompted.
-2. **Pick your devices** under *Devices*:
+2. **Settings** page – pick your devices:
    - **Microphone:** your real mic.
    - **Output:** `CABLE Input (VB-Audio Virtual Cable)`.
-3. Optionally tick **"Hear yourself while tuning, via:"** and choose your headphones.
-4. Press **Start**.
-5. **Shape your sound** – choose a preset, drag the EQ sliders, or press **Auto-Tune Voice** and talk normally for a few seconds, then click **Keep** or **Revert**.
-6. Tick **AI noise removal** if there's background noise. Then set the **Dynamics**: raise **Gain** if the *Input* meter barely moves, raise **Gate** until background noise disappears between words, and add **Loudness** for a fuller, more even voice. Adjust **Pitch** and **Mic Crunch** if you want an effect.
-7. **Manage presets** (next to the *Preset* dropdown):
+   - Optionally tick **Hear yourself while tuning** and choose your headphones.
+3. **Home** page – press **Start** and check that the *Input* meter moves when you talk.
+4. **Clean-up** page – tick **AI noise removal** if there's background noise. Raise **Gain** if the *Input* meter barely moves, raise **Gate** until noise disappears between words, and add **Loudness** for a fuller, more even voice. Or press **Auto-Tune Voice**, talk for a few seconds, then click **Keep** or **Revert** in the bar at the bottom.
+5. **Equalizer** page – drag the bands to shape your voice.
+6. **Voice effects** page – change **Pitch** or add **Mic Crunch** for fun.
+7. **Home** page – manage presets:
    - **+ New preset...** (top of the dropdown) – creates a new preset from your current settings under a name of your choice.
    - **Save** – stores your changes into the selected preset.
    - **Delete** – removes one of your own presets. For a built-in preset you've changed, this button becomes **Reset** and restores its original settings.
-   - **⋯ → Export this preset...** – saves the current settings to a `.eqpreset` file you can share.
-   - **⋯ → Import presets...** – adds presets from one or more `.eqpreset` files. If a name is already taken, the import gets a number added (e.g. "My Voice (2)") instead of overwriting.
+   - To share presets, use **Import presets...** / **Export current preset...** on the **Settings** page. Imports never overwrite: a name that's already taken gets a number added (e.g. "My Voice (2)").
 8. **In Discord / OBS / Zoom**, set the input/microphone device to `CABLE Output (VB-Audio Virtual Cable)`.
 
 Closing the window keeps the app in the system tray; use the tray menu to show it, start/stop processing, or exit.

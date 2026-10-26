@@ -132,16 +132,30 @@ public partial class MainWindow : Window
         WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
     }
 
-    private void PresetMenu_Click(object sender, RoutedEventArgs e)
+    /// <summary>
+    /// Sidebar navigation: each nav RadioButton carries the x:Name of its page
+    /// in CommandParameter (Tag holds its icon glyph); show that page only.
+    /// </summary>
+    private void Nav_Checked(object sender, RoutedEventArgs e)
     {
-        // Open the import/export menu on a normal left click, under the button.
-        if (sender is FrameworkElement { ContextMenu: { } menu } button)
+        // Fires once during InitializeComponent for the default (Home) item,
+        // before the pages exist; Home is already the visible page then.
+        if (PagesHost == null || sender is not System.Windows.Controls.RadioButton { CommandParameter: string pageName })
         {
-            menu.PlacementTarget = button;
-            menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
-            menu.DataContext = DataContext;
-            menu.IsOpen = true;
+            return;
         }
+
+        foreach (UIElement page in PagesHost.Children)
+        {
+            page.Visibility = page is FrameworkElement element && element.Name == pageName
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+    }
+
+    private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.IsSidebarExpanded = !_viewModel.IsSidebarExpanded;
     }
 
     private void Close_Click(object sender, RoutedEventArgs e)

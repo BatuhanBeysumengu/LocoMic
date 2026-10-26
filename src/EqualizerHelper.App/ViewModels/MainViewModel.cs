@@ -121,6 +121,26 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private bool isMuted;
 
+    /// <summary>Whether the sidebar shows labels (true) or only icons.</summary>
+    [ObservableProperty]
+    private bool isSidebarExpanded = true;
+
+    /// <summary>One-line summary of the current hotkeys for the Settings page.</summary>
+    public string HotkeySummary
+    {
+        get
+        {
+            var parts = Hotkeys
+                .Where(kv => kv.Value != null)
+                .Select(kv => $"{HotkeyGesture.DisplayName(kv.Key)}: {kv.Value}")
+                .ToList();
+            var firstPreset = new HotkeyGesture(HotkeyGesture.PresetNumberModifiers, System.Windows.Input.Key.D1);
+            var lastPreset = new HotkeyGesture(HotkeyGesture.PresetNumberModifiers, System.Windows.Input.Key.D9);
+            parts.Add($"Preset 1–9: {firstPreset} … {lastPreset}");
+            return string.Join("  ·  ", parts);
+        }
+    }
+
     /// <summary>The user's current global hotkeys (null = disabled for that action).</summary>
     public Dictionary<HotkeyAction, HotkeyGesture?> Hotkeys { get; private set; }
 
@@ -272,6 +292,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
 
         Hotkeys = dialog.Result;
+        OnPropertyChanged(nameof(HotkeySummary));
         SavePersistedSettings();
         HotkeysChanged?.Invoke(this, EventArgs.Empty);
     }

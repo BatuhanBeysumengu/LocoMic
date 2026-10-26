@@ -7,12 +7,16 @@
         xmlns:converters="clr-namespace:EqualizerHelper.App.Converters"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         mc:Ignorable="d"
-        Title="Equalizer Helper" Height="840" Width="1040"
-        MinHeight="760" MinWidth="900"
+        Title="Equalizer Helper" Height="640" Width="920"
+        MinHeight="560" MinWidth="760"
         WindowStyle="None"
+        Foreground="{StaticResource TextPrimaryBrush}"
+        FontFamily="Segoe UI"
+        ToolTipService.InitialShowDelay="350"
+        ToolTipService.ShowDuration="20000"
         Closed="MainWindow_OnClosed">
     <shell:WindowChrome.WindowChrome>
-        <shell:WindowChrome CaptionHeight="36" ResizeBorderThickness="6"
+        <shell:WindowChrome CaptionHeight="44" ResizeBorderThickness="6"
                              GlassFrameThickness="0" CornerRadius="0"
                              UseAeroCaptionButtons="False" />
     </shell:WindowChrome.WindowChrome>
@@ -25,7 +29,45 @@
             <Setter Property="BorderBrush" Value="{StaticResource PanelBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="12" />
-            <Setter Property="Padding" Value="20" />
+            <Setter Property="Padding" Value="22,20" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+        </Style>
+
+        <Style x:Key="PageTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,0,4" />
+        </Style>
+
+        <Style x:Key="PageSubtitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0,0,0,20" />
+        </Style>
+
+        <Style x:Key="CardTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <Style x:Key="ControlLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="ValueTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+        </Style>
+
+        <Style x:Key="HelpTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0,4,0,0" />
         </Style>
 
         <Style x:Key="SectionLabelStyle" TargetType="TextBlock">
@@ -34,48 +76,122 @@
             <Setter Property="Margin" Value="0,0,8,0" />
         </Style>
 
-        <Style x:Key="EyebrowStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}" />
-            <Setter Property="FontSize" Value="11" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Margin" Value="4,0,0,8" />
+        <!-- Sidebar navigation item: icon + label; the label hides when the sidebar is collapsed. -->
+        <Style x:Key="NavItemStyle" TargetType="RadioButton">
+            <Setter Property="GroupName" Value="Navigation" />
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Margin" Value="8,2" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Bd" Background="Transparent" CornerRadius="8" Height="42">
+                            <Grid>
+                                <Border x:Name="Indicator" Width="3" Height="18" CornerRadius="2" HorizontalAlignment="Left"
+                                        Background="{StaticResource AccentBrush}" Visibility="Collapsed" />
+                                <StackPanel Orientation="Horizontal" Margin="14,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{TemplateBinding Tag}" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="17"
+                                               Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" Width="20" />
+                                    <ContentPresenter Margin="14,0,0,0" VerticalAlignment="Center"
+                                                      Visibility="{Binding DataContext.IsSidebarExpanded, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                      TextElement.FontSize="14" TextElement.Foreground="{TemplateBinding Foreground}" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource ControlBackgroundBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource ControlBackgroundBrush}" />
+                                <Setter TargetName="Indicator" Property="Visibility" Value="Visible" />
+                                <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Large on/off pill used for Bypass and Mute on the Home page. -->
+        <Style x:Key="TogglePillStyle" TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Border x:Name="Bd" CornerRadius="10" Padding="16,12" BorderThickness="1"
+                                Background="{StaticResource ControlBackgroundBrush}" BorderBrush="{StaticResource ControlBorderBrush}">
+                            <StackPanel>
+                                <ContentPresenter TextElement.FontSize="14" TextElement.FontWeight="SemiBold" />
+                                <TextBlock x:Name="State" Text="Off" FontSize="12" Foreground="{StaticResource TextMutedBrush}" Margin="0,2,0,0" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource TextMutedBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                <Setter TargetName="State" Property="Text" Value="On" />
+                                <Setter TargetName="State" Property="Foreground" Value="{StaticResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
 
-    <Grid>
+    <Grid Background="{StaticResource WindowBackgroundBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="36" />
+            <RowDefinition Height="44" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-        <!-- Custom title bar -->
-        <Grid Grid.Row="0" Background="{StaticResource PanelBrush}">
+        <!-- Title bar: menu button, app name, window buttons -->
+        <Grid Grid.Row="0" Grid.ColumnSpan="2" Background="{StaticResource PanelBrush}">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0,0,0">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,8,0">
+            <Button Grid.Column="0" Style="{StaticResource CaptionButtonStyle}" Width="56" Click="ToggleSidebar_Click"
+                    shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                    ToolTip="Show or hide the menu labels">
+                <TextBlock Text="&#xE700;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="16"
+                           Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+            </Button>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,0,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,10,0">
                     <Rectangle Width="4" Height="9" Fill="{StaticResource AccentBrush}" Margin="0,0,2,0" VerticalAlignment="Bottom" />
                     <Rectangle Width="4" Height="15" Fill="{StaticResource AccentBrush}" Margin="0,0,2,0" VerticalAlignment="Bottom" />
                     <Rectangle Width="4" Height="11" Fill="{StaticResource AccentBrush}" Margin="0,0,2,0" VerticalAlignment="Bottom" />
                     <Rectangle Width="4" Height="18" Fill="{StaticResource AccentBrush}" VerticalAlignment="Bottom" />
                 </StackPanel>
-                <TextBlock Text="Equalizer Helper" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" />
+                <TextBlock Text="Equalizer Helper" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" />
             </StackPanel>
 
-            <StackPanel Grid.Column="1" Orientation="Horizontal" shell:WindowChrome.IsHitTestVisibleInChrome="True">
-                <Button Style="{StaticResource CaptionButtonStyle}" Click="Minimize_Click">
+            <StackPanel Grid.Column="2" Orientation="Horizontal" shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button Style="{StaticResource CaptionButtonStyle}" Click="Minimize_Click" ToolTip="Minimize to the system tray">
                     <Rectangle Width="10" Height="1"
                                Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
                 </Button>
-                <Button Style="{StaticResource CaptionButtonStyle}" Click="MaximizeRestore_Click">
+                <Button Style="{StaticResource CaptionButtonStyle}" Click="MaximizeRestore_Click" ToolTip="Maximize / restore">
                     <Rectangle Width="10" Height="10"
                                Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                                StrokeThickness="1.2" />
                 </Button>
-                <Button Style="{StaticResource CloseCaptionButtonStyle}" Click="Close_Click">
+                <Button Style="{StaticResource CloseCaptionButtonStyle}" Click="Close_Click"
+                        ToolTip="Close the window (the app keeps running in the system tray; right-click the tray icon to exit)">
                     <Path Data="M0,0 L10,10 M0,10 L10,0"
                           Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                           StrokeThickness="1.2" />
@@ -83,314 +199,473 @@
             </StackPanel>
         </Grid>
 
-        <!-- Main content -->
-        <Grid Grid.Row="1" Margin="24,18,24,24">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
-            <TextBlock Grid.Row="0" Text="DEVICES" Style="{StaticResource EyebrowStyle}" />
-
-            <!-- Controls card: devices, monitor, transport -->
-            <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,20">
-                <StackPanel>
-                    <!-- Device selection -->
-                    <Grid Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="20" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Grid.Column="0" Text="Microphone:" Style="{StaticResource SectionLabelStyle}" />
-                        <ComboBox Grid.Column="1" ItemsSource="{Binding CaptureDevices}"
-                                  SelectedItem="{Binding SelectedCaptureDevice}" VerticalAlignment="Center" />
-
-                        <TextBlock Grid.Column="3" Text="Output:" Style="{StaticResource SectionLabelStyle}" />
-                        <ComboBox Grid.Column="4" ItemsSource="{Binding RenderDevices}"
-                                  SelectedItem="{Binding SelectedRenderDevice}" VerticalAlignment="Center" />
-
-                        <Button Grid.Column="5" Content="Refresh" Margin="12,0,0,0"
-                                Command="{Binding RefreshDevicesCommand}" />
-                    </Grid>
-
-                    <!-- Monitor (hear yourself) -->
-                    <Grid Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <CheckBox Grid.Column="0" Content="Hear yourself while tuning, via:" VerticalAlignment="Center"
-                                  IsChecked="{Binding MonitorEnabled}" />
-                        <ComboBox Grid.Column="1" Width="260" Margin="8,0,0,0" ItemsSource="{Binding RenderDevices}"
-                                  SelectedItem="{Binding SelectedMonitorDevice}" VerticalAlignment="Center" />
-
-                        <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                            <Button Content="Hotkeys..." Padding="12,6" Margin="0,0,16,0" Command="{Binding EditHotkeysCommand}"
-                                    ToolTip="Global shortcuts for Bypass, Mute and switching presets" />
-                            <CheckBox Content="Start with Windows" VerticalAlignment="Center" IsChecked="{Binding StartWithWindows}" />
-                        </StackPanel>
-                    </Grid>
-
-                    <!-- Transport + presets -->
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <Button Grid.Column="0" Padding="20,9" Command="{Binding ToggleStartStopCommand}">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
-                                    <Setter Property="Content" Value="Start" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsRunning}" Value="True">
-                                            <Setter Property="Content" Value="Stop" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
-                            <CheckBox Content="Bypass" VerticalAlignment="Center" IsChecked="{Binding Bypass}" />
-                            <CheckBox Content="Mute" VerticalAlignment="Center" Margin="12,0,0,0" IsChecked="{Binding IsMuted}"
-                                      ToolTip="Silences your processed mic (and the monitor)" />
-                        </StackPanel>
-
-                        <Button Grid.Column="2" Padding="14,8" Margin="16,0,0,0" Command="{Binding ToggleAutoTuneCommand}">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                    <Setter Property="Content" Value="Auto-Tune Voice" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsAutoTuning}" Value="True">
-                                            <Setter Property="Content" Value="Cancel Auto-Tune" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-
-                        <TextBlock Grid.Column="4" Text="Preset:" Style="{StaticResource SectionLabelStyle}" />
-                        <ComboBox Grid.Column="5" Width="180" ItemsSource="{Binding Presets}"
-                                  SelectedItem="{Binding SelectedPreset}" />
-                        <Button Grid.Column="6" Content="Save" Padding="12,8" Margin="8,0,0,0"
-                                Command="{Binding SavePresetCommand}"
-                                ToolTip="Save the current EQ, pitch and crunch into the selected preset" />
-                        <Button Grid.Column="7" Content="{Binding DeleteButtonText}" Padding="12,8" Margin="8,0,0,0"
-                                Command="{Binding DeletePresetCommand}"
-                                ToolTip="Delete your preset, or reset an edited built-in preset to its original settings" />
-                        <Button Grid.Column="8" Content="⋯" Padding="12,8" Margin="8,0,0,0" Click="PresetMenu_Click"
-                                ToolTip="Import or export presets">
-                            <Button.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="Import presets..." Command="{Binding ImportPresetsCommand}" />
-                                    <MenuItem Header="Export this preset..." Command="{Binding ExportPresetCommand}" />
-                                </ContextMenu>
-                            </Button.ContextMenu>
-                        </Button>
-                    </Grid>
-
-                    <!-- Pitch (fun voice effect) -->
-                    <Grid Margin="0,16,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="260" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Grid.Column="0" Text="Pitch:" Style="{StaticResource SectionLabelStyle}" />
-                        <Slider Grid.Column="1" Style="{StaticResource HorizontalSliderStyle}" Minimum="-12" Maximum="12"
-                                Value="{Binding PitchSemitones}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center"
-                                   Foreground="{StaticResource AccentBrush}" Width="70">
-                            <Run Text="{Binding PitchSemitones, StringFormat={}{0:+0;-0;0} st}" />
-                        </TextBlock>
-                    </Grid>
-
-                    <!-- Mic Crunch (distortion + compression, fun voice effect) -->
-                    <Grid Margin="0,16,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="260" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Grid.Column="0" Text="Mic Crunch:" Style="{StaticResource SectionLabelStyle}" />
-                        <Slider Grid.Column="1" Style="{StaticResource HorizontalSliderStyle}" Minimum="0" Maximum="1"
-                                Value="{Binding MicCrunch}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center"
-                                   Foreground="{StaticResource AccentBrush}" Width="70">
-                            <Run Text="{Binding MicCrunch, StringFormat={}{0:P0}}" />
-                        </TextBlock>
-                    </Grid>
-
-                    <!-- AI noise removal (RNNoise) -->
-                    <Grid Margin="0,16,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="260" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <CheckBox Grid.Column="0" Content="AI noise removal" VerticalAlignment="Center"
-                                  IsChecked="{Binding NoiseRemoval}"
-                                  ToolTip="Removes background noise (fans, keyboard, traffic, hum) even while you talk, using the RNNoise neural network. Runs on your CPU." />
-                        <TextBlock Grid.Column="1" Text="Strength:" Margin="16,0,0,0" Style="{StaticResource SectionLabelStyle}"
-                                   IsEnabled="{Binding NoiseRemoval}" />
-                        <Slider Grid.Column="2" Style="{StaticResource HorizontalSliderStyle}" Minimum="0" Maximum="1"
-                                Value="{Binding NoiseRemovalStrength}" VerticalAlignment="Center" IsEnabled="{Binding NoiseRemoval}" />
-                        <TextBlock Grid.Column="3" Margin="10,0,0,0" VerticalAlignment="Center"
-                                   Foreground="{StaticResource AccentBrush}" Width="70">
-                            <Run Text="{Binding NoiseRemovalStrength, StringFormat={}{0:P0}}" />
-                        </TextBlock>
-                    </Grid>
-
-                    <!-- Dynamics: input gain, noise gate, loudness (compressor + safety limiter) -->
-                    <Grid Margin="0,16,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="60" />
-                            <ColumnDefinition Width="24" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="60" />
-                            <ColumnDefinition Width="24" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="60" />
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Grid.Column="0" Text="Gain:" Style="{StaticResource SectionLabelStyle}"
-                                   ToolTip="Boosts or lowers the mic before any processing" />
-                        <Slider Grid.Column="1" Style="{StaticResource HorizontalSliderStyle}" Minimum="-12" Maximum="24"
-                                Value="{Binding InputGainDb}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center"
-                                   Foreground="{StaticResource AccentBrush}">
-                            <Run Text="{Binding InputGainDb, StringFormat={}{0:+0;-0;0} dB}" />
-                        </TextBlock>
-
-                        <TextBlock Grid.Column="4" Text="Gate:" Style="{StaticResource SectionLabelStyle}"
-                                   ToolTip="Turns the mic down when you're not talking (hides keyboard, fan and room noise). Raise it until the noise disappears between words." />
-                        <Slider Grid.Column="5" Style="{StaticResource HorizontalSliderStyle}" Minimum="0" Maximum="1"
-                                Value="{Binding Gate}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="6" Margin="10,0,0,0" VerticalAlignment="Center"
-                                   Foreground="{StaticResource AccentBrush}" Text="{Binding GateDisplay}" />
-
-                        <TextBlock Grid.Column="8" Text="Loudness:" Style="{StaticResource SectionLabelStyle}"
-                                   ToolTip="Evens out your volume and makes your voice fuller and louder. A limiter always stops the output from clipping." />
-                        <Slider Grid.Column="9" Style="{StaticResource HorizontalSliderStyle}" Minimum="0" Maximum="1"
-                                Value="{Binding Loudness}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="10" Margin="10,0,0,0" VerticalAlignment="Center"
-                                   Foreground="{StaticResource AccentBrush}">
-                            <Run Text="{Binding Loudness, StringFormat={}{0:P0}}" />
-                        </TextBlock>
-                    </Grid>
+        <!-- Sidebar -->
+        <Border Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Background="{StaticResource PanelBrush}"
+                BorderBrush="{StaticResource PanelBorderBrush}" BorderThickness="0,1,1,0">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Width" Value="196" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSidebarExpanded}" Value="False">
+                            <Setter Property="Width" Value="68" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <DockPanel Margin="0,10,0,12">
+                <!-- Running indicator at the bottom of the sidebar -->
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="24,0,0,0"
+                            ToolTip="Whether your mic is currently being processed">
+                    <Ellipse Width="9" Height="9" VerticalAlignment="Center">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="{StaticResource TextMutedBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                        <Setter Property="Fill" Value="{StaticResource AccentBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <TextBlock Margin="10,0,0,0" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                               Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="Stopped" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                        <Setter Property="Text" Value="Running" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </StackPanel>
-            </Border>
 
-            <TextBlock Grid.Row="2" Text="EQUALIZER" Style="{StaticResource EyebrowStyle}" />
+                <StackPanel>
+                    <RadioButton Style="{StaticResource NavItemStyle}" Tag="&#xE80F;" Content="Home" IsChecked="True"
+                                 Checked="Nav_Checked" CommandParameter="HomePage"
+                                 ToolTip="Home: start/stop, presets, bypass, mute and levels" />
+                    <RadioButton Style="{StaticResource NavItemStyle}" Tag="&#xE720;" Content="Clean-up"
+                                 Checked="Nav_Checked" CommandParameter="CleanupPage"
+                                 ToolTip="Clean-up: noise removal, gain, gate, loudness and Auto-Tune" />
+                    <RadioButton Style="{StaticResource NavItemStyle}" Tag="&#xE9E9;" Content="Equalizer"
+                                 Checked="Nav_Checked" CommandParameter="EqualizerPage"
+                                 ToolTip="Equalizer: shape your voice with the 6 bands" />
+                    <RadioButton Style="{StaticResource NavItemStyle}" Tag="&#xE8D6;" Content="Voice effects"
+                                 Checked="Nav_Checked" CommandParameter="VoicePage"
+                                 ToolTip="Voice effects: pitch and mic crunch" />
+                    <RadioButton Style="{StaticResource NavItemStyle}" Tag="&#xE713;" Content="Settings"
+                                 Checked="Nav_Checked" CommandParameter="SettingsPage"
+                                 ToolTip="Settings: devices, monitoring, hotkeys, startup and preset files" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
 
-            <!-- EQ bands -->
-            <Border Grid.Row="3" Style="{StaticResource CardStyle}" Margin="0,0,0,20">
-                <ItemsControl ItemsSource="{Binding Bands}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Vertical" Margin="20,0" Width="120" HorizontalAlignment="Center">
-                                <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,0,0,4" />
-                                <TextBlock HorizontalAlignment="Center" Margin="0,0,0,12" Foreground="{StaticResource TextMutedBrush}"
-                                           FontSize="11">
-                                    <Run Text="{Binding FrequencyHz, StringFormat={}{0:0} Hz}" />
-                                </TextBlock>
+        <!-- Pages -->
+        <Grid x:Name="PagesHost" Grid.Row="1" Grid.Column="1">
 
-                                <Slider Orientation="Vertical" Height="220" Minimum="-15" Maximum="15"
-                                        Value="{Binding GainDb}" HorizontalAlignment="Center" />
+            <!-- HOME -->
+            <ScrollViewer x:Name="HomePage" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="28,24,28,12" MaxWidth="760">
+                    <TextBlock Text="Home" Style="{StaticResource PageTitleStyle}" />
+                    <TextBlock Text="Start processing, pick a preset, and keep an eye on your levels." Style="{StaticResource PageSubtitleStyle}" />
 
-                                <TextBlock Text="{Binding GainDb, StringFormat={}{0:0.0} dB}"
-                                           HorizontalAlignment="Center" Margin="0,12,0,12" Foreground="{StaticResource AccentBrush}" />
-
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
-                                    <TextBlock Text="Q" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="{StaticResource TextSecondaryBrush}" />
-                                    <TextBox Text="{Binding Q, StringFormat=0.00}" Width="48" />
-                                </StackPanel>
-
-                                <CheckBox Content="On" IsChecked="{Binding Enabled}" HorizontalAlignment="Center" />
+                    <Border Style="{StaticResource CardStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" Width="150" Height="54" FontSize="16" Command="{Binding ToggleStartStopCommand}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
+                                        <Setter Property="Content" Value="Start" />
+                                        <Setter Property="ToolTip" Value="Start processing your mic and sending it to the output device" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                                <Setter Property="Content" Value="Stop" />
+                                                <Setter Property="ToolTip" Value="Stop processing your mic" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <StackPanel Grid.Column="1" Margin="22,0,0,0" VerticalAlignment="Center">
+                                <Grid Margin="0,0,0,10" ToolTip="Your mic level before processing. If it barely moves, raise Gain on the Clean-up page.">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="64" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Input" Style="{StaticResource SectionLabelStyle}" />
+                                    <ProgressBar Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding InputLevel}" Height="10" />
+                                </Grid>
+                                <Grid ToolTip="The processed level going to your output device (what Discord/OBS hear)">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="64" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Output" Style="{StaticResource SectionLabelStyle}" />
+                                    <ProgressBar Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding OutputLevel}" Height="10" />
+                                </Grid>
                             </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </Border>
+                        </Grid>
+                    </Border>
 
-            <TextBlock Grid.Row="4" Text="STATUS" Style="{StaticResource EyebrowStyle}" />
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Preset" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,12" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ComboBox Grid.Column="0" ItemsSource="{Binding Presets}" SelectedItem="{Binding SelectedPreset}" Height="38"
+                                          ToolTip="Pick a saved sound. Choose '+ New preset...' to create your own from the current settings." />
+                                <Button Grid.Column="1" Content="Save" Padding="16,8" Margin="8,0,0,0"
+                                        Command="{Binding SavePresetCommand}"
+                                        ToolTip="Save all current settings into the selected preset" />
+                                <Button Grid.Column="2" Content="{Binding DeleteButtonText}" Padding="16,8" Margin="8,0,0,0"
+                                        Command="{Binding DeletePresetCommand}"
+                                        ToolTip="Delete your own preset, or reset a built-in preset you changed back to its original settings" />
+                            </Grid>
+                            <TextBlock Style="{StaticResource HelpTextStyle}" Margin="0,8,0,0"
+                                       Text="A preset stores everything: noise removal, dynamics, equalizer and voice effects." />
+                        </StackPanel>
+                    </Border>
 
-            <!-- Status card: meters, status text, auto-tune/VB-Cable actions -->
-            <Border Grid.Row="5" Style="{StaticResource CardStyle}">
-                <StackPanel>
-                    <Grid Margin="0,0,0,14">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="20" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Grid.Column="0" Text="Input" Style="{StaticResource SectionLabelStyle}" />
-                        <ProgressBar Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding InputLevel}" Height="10" />
-
-                        <TextBlock Grid.Column="3" Text="Output" Style="{StaticResource SectionLabelStyle}" />
-                        <ProgressBar Grid.Column="4" Minimum="0" Maximum="1" Value="{Binding OutputLevel}" Height="10" />
-                    </Grid>
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" VerticalAlignment="Center" TextWrapping="Wrap"
-                                   Foreground="{StaticResource TextSecondaryBrush}" />
-
-                        <Button Grid.Column="1" Content="Get VB-Audio Virtual Cable"
-                                Command="{Binding OpenVirtualCableDownloadPageCommand}"
-                                Visibility="{Binding VirtualCableDetected, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
-
-                        <Button Grid.Column="2" Content="Keep" Margin="8,0,0,0"
-                                Command="{Binding KeepAutoTuneCommand}"
-                                Visibility="{Binding CanRevertAutoTune, Converter={StaticResource BoolToVisibilityConverter}}" />
-
-                        <Button Grid.Column="3" Content="Revert" Margin="8,0,0,0"
-                                Command="{Binding RevertAutoTuneCommand}"
-                                Visibility="{Binding CanRevertAutoTune, Converter={StaticResource BoolToVisibilityConverter}}" />
-                    </Grid>
+                    <UniformGrid Columns="2">
+                        <CheckBox Style="{StaticResource TogglePillStyle}" Content="Bypass" IsChecked="{Binding Bypass}" Margin="0,0,8,0"
+                                  ToolTip="Skip all processing so you can compare with your original mic sound (Ctrl+Alt+B by default)" />
+                        <CheckBox Style="{StaticResource TogglePillStyle}" Content="Mute" IsChecked="{Binding IsMuted}" Margin="8,0,0,0"
+                                  ToolTip="Silence your mic for everyone (Ctrl+Alt+M by default)" />
+                    </UniformGrid>
                 </StackPanel>
-            </Border>
+            </ScrollViewer>
+
+            <!-- CLEAN-UP -->
+            <ScrollViewer x:Name="CleanupPage" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+                <StackPanel Margin="28,24,28,12" MaxWidth="760">
+                    <TextBlock Text="Clean-up" Style="{StaticResource PageTitleStyle}" />
+                    <TextBlock Text="Remove background noise and make your voice clear and even." Style="{StaticResource PageSubtitleStyle}" />
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <CheckBox Content="AI noise removal" IsChecked="{Binding NoiseRemoval}" FontSize="15"
+                                      ToolTip="Removes background noise (fans, keyboard, traffic, hum) even while you talk" />
+                            <TextBlock Style="{StaticResource HelpTextStyle}" Margin="24,4,0,14"
+                                       Text="Uses the RNNoise neural network on your CPU. Adds about 10 ms of delay." />
+                            <Grid IsEnabled="{Binding NoiseRemoval}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="70" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Strength" Style="{StaticResource ControlLabelStyle}" />
+                                <Slider Grid.Column="1" Style="{StaticResource HorizontalSliderStyle}" Minimum="0" Maximum="1"
+                                        Value="{Binding NoiseRemovalStrength}" VerticalAlignment="Center"
+                                        ToolTip="How much noise to remove. Lower it if your voice sounds robotic or underwater." />
+                                <TextBlock Grid.Column="2" Style="{StaticResource ValueTextStyle}" Text="{Binding NoiseRemovalStrength, StringFormat={}{0:P0}}" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Dynamics" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,14" />
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="70" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Gain" Style="{StaticResource ControlLabelStyle}" />
+                                <Slider Grid.Column="1" Style="{StaticResource HorizontalSliderStyle}" Minimum="-12" Maximum="24"
+                                        Value="{Binding InputGainDb}" VerticalAlignment="Center"
+                                        ToolTip="Makes your mic louder or quieter before anything else happens" />
+                                <TextBlock Grid.Column="2" Style="{StaticResource ValueTextStyle}" Text="{Binding InputGainDb, StringFormat={}{0:+0;-0;0} dB}" />
+                            </Grid>
+                            <TextBlock Style="{StaticResource HelpTextStyle}" Margin="110,2,70,16"
+                                       Text="Raise it if the Input meter on Home barely moves." />
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="70" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Gate" Style="{StaticResource ControlLabelStyle}" />
+                                <Slider Grid.Column="1" Style="{StaticResource HorizontalSliderStyle}" Minimum="0" Maximum="1"
+                                        Value="{Binding Gate}" VerticalAlignment="Center"
+                                        ToolTip="Turns your mic down when you're not talking. Raise it until noise disappears between words." />
+                                <TextBlock Grid.Column="2" Style="{StaticResource ValueTextStyle}" Text="{Binding GateDisplay}" />
+                            </Grid>
+                            <TextBlock Style="{StaticResource HelpTextStyle}" Margin="110,2,70,16"
+                                       Text="Hides keyboard, fan and room noise in the pauses. Too high cuts off quiet words." />
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="70" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Loudness" Style="{StaticResource ControlLabelStyle}" />
+                                <Slider Grid.Column="1" Style="{StaticResource HorizontalSliderStyle}" Minimum="0" Maximum="1"
+                                        Value="{Binding Loudness}" VerticalAlignment="Center"
+                                        ToolTip="Evens out your volume and makes your voice fuller and louder" />
+                                <TextBlock Grid.Column="2" Style="{StaticResource ValueTextStyle}" Text="{Binding Loudness, StringFormat={}{0:P0}}" />
+                            </Grid>
+                            <TextBlock Style="{StaticResource HelpTextStyle}" Margin="110,2,70,0"
+                                       Text="A built-in limiter always stops the output from clipping, even when you shout." />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                                <TextBlock Text="Auto-Tune Voice" Style="{StaticResource CardTitleStyle}" />
+                                <TextBlock Style="{StaticResource HelpTextStyle}"
+                                           Text="Talk normally for a few seconds and the equalizer adjusts itself to a natural voice. Start the mic first. Afterwards, Keep or Revert the result in the bar at the bottom." />
+                            </StackPanel>
+                            <Button Grid.Column="1" Padding="16,9" VerticalAlignment="Center" Command="{Binding ToggleAutoTuneCommand}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                        <Setter Property="Content" Value="Auto-Tune Voice" />
+                                        <Setter Property="ToolTip" Value="Listen to your voice and tune the equalizer automatically" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsAutoTuning}" Value="True">
+                                                <Setter Property="Content" Value="Cancel Auto-Tune" />
+                                                <Setter Property="ToolTip" Value="Stop auto-tuning and go back to your previous settings" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- EQUALIZER -->
+            <ScrollViewer x:Name="EqualizerPage" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+                <StackPanel Margin="28,24,28,12" MaxWidth="900">
+                    <TextBlock Text="Equalizer" Style="{StaticResource PageTitleStyle}" />
+                    <TextBlock Text="Drag a band up to boost it or down to cut it. Changes are live; click Save on Home to keep them in your preset." Style="{StaticResource PageSubtitleStyle}" />
+
+                    <Border Style="{StaticResource CardStyle}" Padding="12,22">
+                        <ItemsControl ItemsSource="{Binding Bands}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Rows="1" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                        <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,2" />
+                                        <TextBlock HorizontalAlignment="Center" Margin="0,0,0,14" Foreground="{StaticResource TextMutedBrush}" FontSize="12"
+                                                   Text="{Binding FrequencyHz, StringFormat={}{0:0} Hz}" />
+
+                                        <Slider Orientation="Vertical" Height="200" Minimum="-15" Maximum="15"
+                                                Value="{Binding GainDb}" HorizontalAlignment="Center"
+                                                ToolTip="Boost (up) or cut (down) this part of your voice" />
+
+                                        <TextBlock Text="{Binding GainDb, StringFormat={}{0:+0.0;-0.0;0.0} dB}"
+                                                   HorizontalAlignment="Center" Margin="0,12,0,10" FontSize="13" Foreground="{StaticResource AccentBrush}" />
+
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8"
+                                                    ToolTip="Width of the band: lower = wider and gentler, higher = narrower and more precise">
+                                            <TextBlock Text="Width" VerticalAlignment="Center" Margin="0,0,6,0" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
+                                            <TextBox Text="{Binding Q, StringFormat=0.00}" Width="58" />
+                                        </StackPanel>
+
+                                        <CheckBox Content="On" IsChecked="{Binding Enabled}" HorizontalAlignment="Center"
+                                                  ToolTip="Turn this band on or off" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+
+                    <TextBlock Style="{StaticResource HelpTextStyle}"
+                               Text="Rumble = low hum and thumps · Mud = boxy, muffled sound · Body = fullness · Presence = clarity · Sibilance = harsh 's' sounds · Air = sparkle" />
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- VOICE EFFECTS -->
+            <ScrollViewer x:Name="VoicePage" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+                <StackPanel Margin="28,24,28,12" MaxWidth="760">
+                    <TextBlock Text="Voice effects" Style="{StaticResource PageTitleStyle}" />
+                    <TextBlock Text="Fun effects that change how your voice sounds." Style="{StaticResource PageSubtitleStyle}" />
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="70" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Pitch" Style="{StaticResource ControlLabelStyle}" />
+                                <Slider Grid.Column="1" Style="{StaticResource HorizontalSliderStyle}" Minimum="-12" Maximum="12"
+                                        Value="{Binding PitchSemitones}" VerticalAlignment="Center"
+                                        ToolTip="Make your voice deeper (left) or higher (right), in musical semitones" />
+                                <TextBlock Grid.Column="2" Style="{StaticResource ValueTextStyle}" Text="{Binding PitchSemitones, StringFormat={}{0:+0;-0;0} st}" />
+                            </Grid>
+                            <TextBlock Style="{StaticResource HelpTextStyle}" Margin="110,2,70,16"
+                                       Text="0 = your normal voice. 12 semitones = one octave." />
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="70" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Mic Crunch" Style="{StaticResource ControlLabelStyle}" />
+                                <Slider Grid.Column="1" Style="{StaticResource HorizontalSliderStyle}" Minimum="0" Maximum="1"
+                                        Value="{Binding MicCrunch}" VerticalAlignment="Center"
+                                        ToolTip="Adds a cheap, overdriven 'bad mic' sound (distortion + heavy compression)" />
+                                <TextBlock Grid.Column="2" Style="{StaticResource ValueTextStyle}" Text="{Binding MicCrunch, StringFormat={}{0:P0}}" />
+                            </Grid>
+                            <TextBlock Style="{StaticResource HelpTextStyle}" Margin="110,2,70,0"
+                                       Text="0% = clean. Try the 'Deep Bass (Fun)' preset to hear it with pitch." />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- SETTINGS -->
+            <ScrollViewer x:Name="SettingsPage" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+                <StackPanel Margin="28,24,28,12" MaxWidth="760">
+                    <TextBlock Text="Settings" Style="{StaticResource PageTitleStyle}" />
+                    <TextBlock Text="Devices, monitoring, shortcuts and preset files." Style="{StaticResource PageSubtitleStyle}" />
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Devices" Style="{StaticResource CardTitleStyle}" VerticalAlignment="Center" />
+                                <Button Grid.Column="1" Content="Refresh" Command="{Binding RefreshDevicesCommand}"
+                                        ToolTip="Look again for microphones and speakers (use after plugging something in)" />
+                            </Grid>
+
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Microphone" Style="{StaticResource ControlLabelStyle}" />
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding CaptureDevices}" SelectedItem="{Binding SelectedCaptureDevice}"
+                                          ToolTip="Your real microphone" />
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Output" Style="{StaticResource ControlLabelStyle}" />
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding RenderDevices}" SelectedItem="{Binding SelectedRenderDevice}"
+                                          ToolTip="Where the processed voice goes. Pick 'CABLE Input (VB-Audio Virtual Cable)'." />
+                            </Grid>
+                            <TextBlock Style="{StaticResource HelpTextStyle}" Margin="110,6,0,0"
+                                       Text="Then choose 'CABLE Output' as your microphone in Discord, OBS or Zoom." />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <CheckBox Content="Hear yourself while tuning" IsChecked="{Binding MonitorEnabled}" FontSize="14"
+                                      ToolTip="Play your processed voice in your headphones so you can hear your changes" />
+                            <Grid Margin="0,12,0,0" IsEnabled="{Binding MonitorEnabled}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Play through" Style="{StaticResource ControlLabelStyle}" />
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding RenderDevices}" SelectedItem="{Binding SelectedMonitorDevice}"
+                                          ToolTip="Headphones to hear yourself on (use headphones, not speakers, to avoid echo)" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Hotkeys" Style="{StaticResource CardTitleStyle}" />
+                                    <TextBlock Style="{StaticResource HelpTextStyle}" Text="{Binding HotkeySummary}" />
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="Change..." VerticalAlignment="Center" Command="{Binding EditHotkeysCommand}"
+                                        ToolTip="Change the keyboard shortcuts that work everywhere, even in games" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Preset files" Style="{StaticResource CardTitleStyle}" />
+                            <TextBlock Style="{StaticResource HelpTextStyle}" Margin="0,4,0,12"
+                                       Text="Share presets as .eqpreset files, or add presets someone sent you." />
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Import presets..." Command="{Binding ImportPresetsCommand}"
+                                        ToolTip="Add presets from .eqpreset files. Existing presets are never overwritten." />
+                                <Button Content="Export current preset..." Margin="8,0,0,0" Command="{Binding ExportPresetCommand}"
+                                        ToolTip="Save the current settings to a .eqpreset file you can share" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <CheckBox Content="Start with Windows" IsChecked="{Binding StartWithWindows}" FontSize="14"
+                                  ToolTip="Open Equalizer Helper automatically when you sign in to Windows" />
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
         </Grid>
+
+        <!-- Status bar (all pages) -->
+        <Border Grid.Row="2" Grid.Column="1" Background="{StaticResource PanelBrush}"
+                BorderBrush="{StaticResource PanelBorderBrush}" BorderThickness="0,1,0,0" Padding="20,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" VerticalAlignment="Center" TextWrapping="Wrap"
+                           FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,12,0" />
+
+                <Button Grid.Column="1" Content="Get VB-Audio Virtual Cable"
+                        Command="{Binding OpenVirtualCableDownloadPageCommand}"
+                        Visibility="{Binding VirtualCableDetected, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                        ToolTip="Open the free VB-Audio Virtual Cable download page. It lets other apps use your processed mic." />
+
+                <Button Grid.Column="2" Content="Keep" Margin="8,0,0,0"
+                        Command="{Binding KeepAutoTuneCommand}"
+                        Visibility="{Binding CanRevertAutoTune, Converter={StaticResource BoolToVisibilityConverter}}"
+                        ToolTip="Keep the auto-tuned equalizer (you can also save it as a preset)" />
+
+                <Button Grid.Column="3" Content="Revert" Margin="8,0,0,0"
+                        Command="{Binding RevertAutoTuneCommand}"
+                        Visibility="{Binding CanRevertAutoTune, Converter={StaticResource BoolToVisibilityConverter}}"
+                        ToolTip="Undo the auto-tune and go back to your previous equalizer" />
+            </Grid>
+        </Border>
     </Grid>
 </Window>

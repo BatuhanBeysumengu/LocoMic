@@ -76,6 +76,33 @@
         <Setter Property="FontSize" Value="13" />
     </Style>
 
+    <!-- Tooltips: dark, rounded, wrapped to a readable width -->
+    <Style TargetType="ToolTip">
+        <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource ControlBorderBrush}" />
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="HasDropShadow" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToolTip">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1" CornerRadius="6" Padding="10,7" MaxWidth="320">
+                        <ContentPresenter>
+                            <ContentPresenter.Resources>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextWrapping" Value="Wrap" />
+                                    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                                </Style>
+                            </ContentPresenter.Resources>
+                        </ContentPresenter>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Context menus -->
     <Style TargetType="ContextMenu">
         <Setter Property="Background" Value="{StaticResource PanelBrush}" />
