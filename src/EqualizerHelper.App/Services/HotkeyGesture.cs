@@ -11,6 +11,16 @@ public enum HotkeyAction
     ToggleMute,
     NextPreset,
     PreviousPreset,
+    Sound1,
+    Sound2,
+    Sound3,
+    Sound4,
+    Sound5,
+    Sound6,
+    Sound7,
+    Sound8,
+    Sound9,
+    StopAllSounds,
 }
 
 /// <summary>
@@ -24,7 +34,35 @@ public record HotkeyGesture(ModifierKeys Modifiers, Key Key)
         [HotkeyAction.ToggleMute] = new(ModifierKeys.Control | ModifierKeys.Alt, Key.M),
         [HotkeyAction.NextPreset] = new(ModifierKeys.Control | ModifierKeys.Alt, Key.Right),
         [HotkeyAction.PreviousPreset] = new(ModifierKeys.Control | ModifierKeys.Alt, Key.Left),
+        [HotkeyAction.Sound1] = new(ModifierKeys.None, Key.NumPad1),
+        [HotkeyAction.Sound2] = new(ModifierKeys.None, Key.NumPad2),
+        [HotkeyAction.Sound3] = new(ModifierKeys.None, Key.NumPad3),
+        [HotkeyAction.Sound4] = new(ModifierKeys.None, Key.NumPad4),
+        [HotkeyAction.Sound5] = new(ModifierKeys.None, Key.NumPad5),
+        [HotkeyAction.Sound6] = new(ModifierKeys.None, Key.NumPad6),
+        [HotkeyAction.Sound7] = new(ModifierKeys.None, Key.NumPad7),
+        [HotkeyAction.Sound8] = new(ModifierKeys.None, Key.NumPad8),
+        [HotkeyAction.Sound9] = new(ModifierKeys.None, Key.NumPad9),
+        [HotkeyAction.StopAllSounds] = new(ModifierKeys.None, Key.NumPad0),
     };
+
+    /// <summary>
+    /// Soundboard hotkeys are only registered while the engine is running, so
+    /// plain numpad keys don't stop the numpad typing in other apps the rest
+    /// of the time.
+    /// </summary>
+    public static bool IsSoundAction(HotkeyAction action) => action >= HotkeyAction.Sound1;
+
+    /// <summary>1-based sound number for Sound1..Sound9, otherwise null.</summary>
+    public static int? SoundNumber(HotkeyAction action) =>
+        action is >= HotkeyAction.Sound1 and <= HotkeyAction.Sound9 ? action - HotkeyAction.Sound1 + 1 : null;
+
+    /// <summary>
+    /// Keys that may be used without Ctrl/Alt/Shift/Win: the numpad and F13–F24,
+    /// which aren't used for normal typing in most apps.
+    /// </summary>
+    public static bool IsAllowedWithoutModifiers(Key key) =>
+        key is >= Key.NumPad0 and <= Key.Divide or >= Key.F13 and <= Key.F24;
 
     /// <summary>Modifiers used with 1–9 to jump straight to a preset by its position in the list.</summary>
     public static ModifierKeys PresetNumberModifiers => ModifierKeys.Control | ModifierKeys.Alt;
@@ -35,6 +73,8 @@ public record HotkeyGesture(ModifierKeys Modifiers, Key Key)
         HotkeyAction.ToggleMute => "Toggle Mute",
         HotkeyAction.NextPreset => "Next preset",
         HotkeyAction.PreviousPreset => "Previous preset",
+        HotkeyAction.StopAllSounds => "Stop all sounds",
+        _ when SoundNumber(action) is int n => $"Play/stop sound {n}",
         _ => action.ToString(),
     };
 
@@ -77,12 +117,18 @@ public record HotkeyGesture(ModifierKeys Modifiers, Key Key)
             }
         }
 
-        return key == null || modifiers == ModifierKeys.None ? null : new HotkeyGesture(modifiers, key.Value);
+        if (key == null || (modifiers == ModifierKeys.None && !IsAllowedWithoutModifiers(key.Value)))
+        {
+            return null;
+        }
+
+        return new HotkeyGesture(modifiers, key.Value);
     }
 
     private static string KeyName(Key key) => key switch
     {
         >= Key.D0 and <= Key.D9 => ((int)(key - Key.D0)).ToString(),
+        >= Key.NumPad0 and <= Key.NumPad9 => "Num" + (int)(key - Key.NumPad0),
         _ => key.ToString(),
     };
 
@@ -91,6 +137,11 @@ public record HotkeyGesture(ModifierKeys Modifiers, Key Key)
         if (name.Length == 1 && char.IsDigit(name[0]))
         {
             return Key.D0 + (name[0] - '0');
+        }
+
+        if (name.Length == 4 && name.StartsWith("Num", StringComparison.OrdinalIgnoreCase) && char.IsDigit(name[3]))
+        {
+            return Key.NumPad0 + (name[3] - '0');
         }
 
         return Enum.TryParse(name, ignoreCase: true, out Key key) ? key : null;

@@ -434,7 +434,7 @@
 
                                     <Border Grid.Row="1" Background="{StaticResource ControlBackgroundBrush}" CornerRadius="8" Height="116" Margin="0,0,0,10">
                                         <Grid>
-                                            <TextBlock Text="Add songs or sound effects with '+ Add', then press ▶ to play them into your mic while you talk."
+                                            <TextBlock Text="Add songs or sound effects with '+ Add', then press ▶ (or numpad 1–9) to play them into your mic while you talk."
                                                        Style="{StaticResource HelpTextStyle}" Margin="12,0" VerticalAlignment="Center" TextAlignment="Center">
                                                 <TextBlock.Visibility>
                                                     <Binding Path="Sounds.Count" Converter="{StaticResource ZeroToVisibleConverter}" />
@@ -446,6 +446,7 @@
                                                         <DataTemplate>
                                                             <Grid Margin="0,1">
                                                                 <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="18" />
                                                                     <ColumnDefinition Width="Auto" />
                                                                     <ColumnDefinition Width="*" />
                                                                     <ColumnDefinition Width="60" />
@@ -453,7 +454,10 @@
                                                                     <ColumnDefinition Width="Auto" />
                                                                 </Grid.ColumnDefinitions>
 
-                                                                <Button Grid.Column="0" Style="{StaticResource IconButtonStyle}"
+                                                                <TextBlock Grid.Column="0" Text="{Binding Number}" FontSize="11" VerticalAlignment="Center"
+                                                                           HorizontalAlignment="Center" Foreground="{StaticResource TextMutedBrush}"
+                                                                           ToolTip="Hotkey number: while started, press this key on the numpad to play/stop the sound (changeable in Settings)" />
+                                                                <Button Grid.Column="1" Style="{StaticResource IconButtonStyle}"
                                                                         Command="{Binding DataContext.ToggleSoundCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                                         CommandParameter="{Binding}">
                                                                     <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="12">
@@ -486,7 +490,7 @@
                                                                     </Button.ToolTip>
                                                                 </Button>
 
-                                                                <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" Margin="6,0,8,0"
+                                                                <TextBlock Grid.Column="2" Text="{Binding Name}" VerticalAlignment="Center" Margin="6,0,8,0"
                                                                            TextTrimming="CharacterEllipsis" ToolTip="{Binding Path}">
                                                                     <TextBlock.Style>
                                                                         <Style TargetType="TextBlock">
@@ -500,15 +504,15 @@
                                                                     </TextBlock.Style>
                                                                 </TextBlock>
 
-                                                                <Slider Grid.Column="2" Style="{StaticResource HorizontalSliderStyle}" Minimum="0" Maximum="1"
+                                                                <Slider Grid.Column="3" Style="{StaticResource HorizontalSliderStyle}" Minimum="0" Maximum="1"
                                                                         Value="{Binding Volume}" VerticalAlignment="Center"
                                                                         ToolTip="Volume of this sound" />
 
-                                                                <CheckBox Grid.Column="3" Style="{StaticResource IconToggleStyle}" Content="&#xE8EE;" Margin="6,0,0,0"
+                                                                <CheckBox Grid.Column="4" Style="{StaticResource IconToggleStyle}" Content="&#xE8EE;" Margin="6,0,0,0"
                                                                           IsChecked="{Binding Loop}"
                                                                           ToolTip="Loop: play this sound over and over (good for background music)" />
 
-                                                                <Button Grid.Column="4" Style="{StaticResource IconButtonStyle}"
+                                                                <Button Grid.Column="5" Style="{StaticResource IconButtonStyle}"
                                                                         Command="{Binding DataContext.RemoveSoundCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                                         CommandParameter="{Binding}"
                                                                         ToolTip="Remove from the list (the file itself is not deleted)">
@@ -637,6 +641,8 @@
                                             ToolTip="Change the keyboard shortcuts. They work everywhere, even in games." />
                                 </Grid>
                                 <TextBlock Style="{StaticResource HelpTextStyle}" Margin="0,10,0,0" Text="{Binding HotkeySummary}" />
+                                <CheckBox Content="Numpad plays sounds (1–9 play/stop, 0 stops all)" Margin="0,12,0,0" IsChecked="{Binding SoundHotkeysEnabled}"
+                                          ToolTip="While the app is started, numpad keys play the sounds in your list. They're released when you press Stop, so the numpad types normally again." />
                             </StackPanel>
                         </Border>
 

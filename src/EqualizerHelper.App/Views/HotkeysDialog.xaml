@@ -6,15 +6,17 @@
         ShowInTaskbar="False" Style="{StaticResource DialogWindowStyle}">
     <StackPanel Margin="16">
         <TextBlock TextWrapping="Wrap" Margin="0,0,0,12"
-                   Text="These work anywhere in Windows, even while you're in a game or the app is in the tray. Click a box and press the keys you want (use Ctrl, Alt, Shift or Win plus a key)." />
+                   Text="These work anywhere in Windows, even while you're in a game or the app is in the tray. Click a box and press the keys you want (Ctrl, Alt, Shift or Win plus a key; numpad keys can be used on their own). Sound keys only work while the app is started." />
 
-        <Grid x:Name="RowsGrid">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="130" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-        </Grid>
+        <ScrollViewer MaxHeight="440" VerticalScrollBarVisibility="Auto">
+            <Grid x:Name="RowsGrid" Margin="0,0,6,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+            </Grid>
+        </ScrollViewer>
 
         <TextBlock x:Name="PresetNumbersText" TextWrapping="Wrap" Margin="0,10,0,0" Opacity="0.75" />
 

@@ -36,6 +36,10 @@ A Windows desktop app that cleans up (or messes with) your microphone in real ti
   | Toggle Mute             | `Ctrl+Alt+M`       |
   | Next / previous preset  | `Ctrl+Alt+→` / `Ctrl+Alt+←` |
   | Jump to preset 1–9      | `Ctrl+Alt+1` … `Ctrl+Alt+9` |
+  | Play/stop sound 1–9     | `Num1` … `Num9` (only while started) |
+  | Stop all sounds         | `Num0` (only while started) |
+
+  The numpad sound keys are only active while the app is started, so the numpad types normally in other apps the rest of the time. They can be turned off or changed in **Settings**.
 
 - **Monitoring** – hear yourself through headphones while tuning.
 - **Live level meters** for input and output.
@@ -70,7 +74,7 @@ Everything you use day to day is on the main screen. Devices, hotkeys, startup a
 4. **Shape your sound:**
    - **Clean-up:** tick **AI noise removal** if there's background noise. Raise **Gain** if the *Input* meter barely moves, raise **Gate** until noise disappears between words, and add **Loudness** for a fuller, more even voice.
    - **Voice:** change **Pitch** or add **Crunch** for fun.
-   - **Sounds:** click **+ Add** to add songs or sound effects, then press ▶ to play one into your mic (■ stops it). Tick ⟲ to loop background music, and keep **Lower while I talk** on so people can still understand you. Sounds only play while the app is started.
+   - **Sounds:** click **+ Add** to add songs or sound effects, then press ▶ or its numpad key (the number next to it) to play it into your mic; press again to stop. `Num0` stops everything. Tick ⟲ to loop background music, and keep **Lower while I talk** on so people can still understand you. Sounds only play while the app is started.
    - **Equalizer:** drag the bands to fine-tune your sound, or press **Auto-Tune Voice**, talk for a few seconds, then click **Keep** or **Revert** at the bottom.
 5. **Presets** (top-right of the main screen):
    - **+ New preset...** (top of the dropdown) – creates a new preset from your current settings under a name of your choice.

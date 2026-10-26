@@ -45,6 +45,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         soundVolume = savedSettings.SoundVolume;
         duckSounds = savedSettings.DuckSounds;
         hearSounds = savedSettings.HearSounds;
+        soundHotkeysEnabled = savedSettings.SoundHotkeysEnabled;
         _engine.Soundboard.Settings.MasterVolume = soundVolume;
         _engine.Soundboard.Settings.DuckWhileTalking = duckSounds;
         _engine.Soundboard.Settings.HearInMonitor = hearSounds;
@@ -147,6 +148,25 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private bool hearSounds;
 
+    [ObservableProperty]
+    private bool soundHotkeysEnabled;
+
+    partial void OnSoundHotkeysEnabledChanged(bool value)
+    {
+        OnPropertyChanged(nameof(HotkeySummary));
+        SavePersistedSettings();
+        HotkeysChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>Play/stop the Nth sound in the list (1-based), e.g. from a numpad hotkey.</summary>
+    public void ToggleSoundByNumber(int number)
+    {
+        if (number >= 1 && number <= Sounds.Count)
+        {
+            ToggleSound(Sounds[number - 1]);
+        }
+    }
+
     partial void OnSoundVolumeChanged(double value)
     {
         _engine.Soundboard.Settings.MasterVolume = value;
@@ -245,6 +265,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _engine.Soundboard.Stop(sound.Id);
         sound.Changed -= OnSoundChanged;
         Sounds.Remove(sound);
+        RenumberSounds();
         SavePersistedSettings();
     }
 
@@ -274,6 +295,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         sound.Changed += OnSoundChanged;
         Sounds.Add(sound);
+        sound.Number = Sounds.Count;
+    }
+
+    private void RenumberSounds()
+    {
+        for (int i = 0; i < Sounds.Count; i++)
+        {
+            Sounds[i].Number = i + 1;
+        }
     }
 
     private void OnSoundChanged(object? sender, EventArgs e) => SavePersistedSettings();
@@ -296,12 +326,19 @@ public partial class MainViewModel : ObservableObject, IDisposable
         get
         {
             var parts = Hotkeys
-                .Where(kv => kv.Value != null)
+                .Where(kv => kv.Value != null && !HotkeyGesture.IsSoundAction(kv.Key))
                 .Select(kv => $"{HotkeyGesture.DisplayName(kv.Key)}: {kv.Value}")
                 .ToList();
             var firstPreset = new HotkeyGesture(HotkeyGesture.PresetNumberModifiers, System.Windows.Input.Key.D1);
             var lastPreset = new HotkeyGesture(HotkeyGesture.PresetNumberModifiers, System.Windows.Input.Key.D9);
             parts.Add($"Preset 1–9: {firstPreset} … {lastPreset}");
+
+            if (SoundHotkeysEnabled)
+            {
+                parts.Add($"Sounds 1–9: {Hotkeys[HotkeyAction.Sound1]?.ToString() ?? "–"} … {Hotkeys[HotkeyAction.Sound9]?.ToString() ?? "–"}");
+                parts.Add($"Stop all sounds: {Hotkeys[HotkeyAction.StopAllSounds]?.ToString() ?? "–"}");
+            }
+
             return string.Join("  ·  ", parts);
         }
     }
@@ -413,6 +450,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
             case HotkeyAction.PreviousPreset:
                 StepPreset(-1);
                 break;
+            case HotkeyAction.StopAllSounds:
+                StopAllSounds();
+                break;
+            default:
+                if (HotkeyGesture.SoundNumber(action) is int number)
+                {
+                    ToggleSoundByNumber(number);
+                }
+
+                break;
         }
     }
 
@@ -497,6 +544,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             SoundVolume = SoundVolume,
             DuckSounds = DuckSounds,
             HearSounds = HearSounds,
+            SoundHotkeysEnabled = SoundHotkeysEnabled,
         });
     }
 

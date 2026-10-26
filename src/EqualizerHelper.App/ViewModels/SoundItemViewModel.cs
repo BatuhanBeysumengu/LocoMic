@@ -31,6 +31,10 @@ public partial class SoundItemViewModel : ObservableObject
     [ObservableProperty]
     private bool isPlaying;
 
+    /// <summary>1-based position in the list (sounds 1–9 have hotkeys).</summary>
+    [ObservableProperty]
+    private int number;
+
     /// <summary>Raised when the user changes something that should be saved.</summary>
     public event EventHandler? Changed;
 

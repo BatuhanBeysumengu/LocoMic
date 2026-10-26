@@ -50,6 +50,16 @@ public partial class MainWindow : Window
         _hotkeys = new GlobalHotkeyService(hwnd);
         RegisterHotkeys();
         _viewModel.HotkeysChanged += (_, _) => RegisterHotkeys();
+
+        // Sound hotkeys (plain numpad keys by default) are only held while the
+        // engine runs, so the numpad types normally in other apps otherwise.
+        _viewModel.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(MainViewModel.IsRunning))
+            {
+                RegisterHotkeys();
+            }
+        };
     }
 
     private void RegisterHotkeys()
@@ -62,8 +72,14 @@ public partial class MainWindow : Window
         _hotkeys.UnregisterAll();
         var failed = new List<string>();
 
+        bool soundKeysActive = _viewModel.IsRunning && _viewModel.SoundHotkeysEnabled;
         foreach (var (action, gesture) in _viewModel.Hotkeys)
         {
+            if (HotkeyGesture.IsSoundAction(action) && !soundKeysActive)
+            {
+                continue;
+            }
+
             if (gesture != null && !_hotkeys.Register(gesture, () => _viewModel.ExecuteHotkey(action)))
             {
                 failed.Add(gesture.ToString());

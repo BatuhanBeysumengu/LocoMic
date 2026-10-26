@@ -84,9 +84,9 @@ public partial class HotkeysDialog : Window
         }
 
         var modifiers = Keyboard.Modifiers;
-        if (modifiers == ModifierKeys.None)
+        if (modifiers == ModifierKeys.None && !HotkeyGesture.IsAllowedWithoutModifiers(key))
         {
-            ShowError("Use at least one of Ctrl, Alt, Shift or Win, so normal typing isn't captured.");
+            ShowError("Use at least one of Ctrl, Alt, Shift or Win (numpad keys can be used on their own), so normal typing isn't captured.");
             return;
         }
 

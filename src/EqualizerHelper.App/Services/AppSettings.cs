@@ -22,6 +22,9 @@ public class AppSettings
     public double SoundVolume { get; set; } = 0.6;
     public bool DuckSounds { get; set; } = true;
     public bool HearSounds { get; set; } = true;
+
+    /// <summary>Soundboard hotkeys (numpad by default), active only while started.</summary>
+    public bool SoundHotkeysEnabled { get; set; } = true;
 }
 
 public class SavedSound
