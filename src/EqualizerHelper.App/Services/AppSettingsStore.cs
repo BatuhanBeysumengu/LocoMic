@@ -10,10 +10,7 @@ namespace EqualizerHelper.App.Services;
 /// </summary>
 public static class AppSettingsStore
 {
-    private static readonly string SettingsPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "EqualizerHelper",
-        "settings.json");
+    private static readonly string SettingsPath = Path.Combine(AppPaths.DataDirectory, "settings.json");
 
     public static AppSettings Load()
     {

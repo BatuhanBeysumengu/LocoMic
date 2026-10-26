@@ -13,19 +13,22 @@ public partial class App : System.Windows.Application
     // Running more than one instance would have them fight over the same
     // mic/output devices, and both independently read-modify-write the same
     // presets.json/settings.json files, silently losing each other's changes.
-    private const string SingleInstanceMutexName = "EqualizerHelper-SingleInstance-7F3D1A2B";
+    private const string SingleInstanceMutexName = "LocoMic-SingleInstance-7F3D1A2B";
     private Mutex? _singleInstanceMutex;
 
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
 
+        // Bring over presets/settings saved under the app's old name.
+        Services.AppPaths.MigrateLegacyData();
+
         _singleInstanceMutex = new Mutex(true, SingleInstanceMutexName, out bool createdNew);
         if (!createdNew)
         {
             System.Windows.MessageBox.Show(
-                "Equalizer Helper is already running. Check your system tray for its icon.",
-                "Equalizer Helper",
+                "LocoMic is already running. Check your system tray for its icon.",
+                "LocoMic",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
             Shutdown();

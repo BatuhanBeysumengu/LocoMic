@@ -19,8 +19,9 @@ namespace EqualizerHelper.App.Presets;
 public static class PresetFile
 {
     public const string Extension = ".eqpreset";
-    public const string DialogFilter = "Equalizer Helper preset (*.eqpreset)|*.eqpreset|JSON files (*.json)|*.json";
+    public const string DialogFilter = "LocoMic preset (*.eqpreset)|*.eqpreset|JSON files (*.json)|*.json";
 
+    // Kept from the app's original name so earlier .eqpreset files still import.
     private const string FormatName = "EqualizerHelper.Preset";
     private const int CurrentVersion = 1;
     private const long MaxFileBytes = 1024 * 1024;
@@ -70,12 +71,12 @@ public static class PresetFile
 
         if (envelope?.Format != FormatName)
         {
-            throw new InvalidDataException("This isn't an Equalizer Helper preset file.");
+            throw new InvalidDataException("This isn't a LocoMic preset file.");
         }
 
         if (envelope.Version > CurrentVersion)
         {
-            throw new InvalidDataException("This preset was made with a newer version of Equalizer Helper.");
+            throw new InvalidDataException("This preset was made with a newer version of LocoMic.");
         }
 
         if (envelope.Presets == null || envelope.Presets.Count == 0)

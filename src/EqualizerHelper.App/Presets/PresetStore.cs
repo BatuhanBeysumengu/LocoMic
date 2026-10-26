@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using EqualizerHelper.App.Services;
 using EqualizerHelper.Dsp;
 
 namespace EqualizerHelper.App.Presets;
 
 public static class PresetStore
 {
-    private static readonly string UserPresetsPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "EqualizerHelper",
-        "presets.json");
+    private static readonly string UserPresetsPath = Path.Combine(AppPaths.DataDirectory, "presets.json");
 
     public static List<EqPreset> GetBuiltInPresets()
     {

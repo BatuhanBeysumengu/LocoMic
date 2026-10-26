@@ -9,7 +9,7 @@
         xmlns:dsp="clr-namespace:EqualizerHelper.Dsp;assembly=EqualizerHelper.Dsp"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         mc:Ignorable="d"
-        Title="Equalizer Helper" Height="840" Width="1080"
+        Title="LocoMic" Height="840" Width="1080"
         MinHeight="640" MinWidth="900"
         WindowStyle="None"
         Foreground="{StaticResource TextPrimaryBrush}"
@@ -203,7 +203,7 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="2,0,0,0">
                 <Image Source="Assets/logo-64.png" Width="22" Height="22" Margin="0,0,8,0" VerticalAlignment="Center"
                        RenderOptions.BitmapScalingMode="HighQuality" />
-                <TextBlock Text="Equalizer Helper" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" />
+                <TextBlock Text="LocoMic" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" />
                 <TextBlock x:Name="PageNameText" Text="" FontSize="12" Margin="8,0,0,0" VerticalAlignment="Center"
                            Foreground="{StaticResource TextSecondaryBrush}" />
             </StackPanel>
@@ -687,7 +687,7 @@
                             <StackPanel>
                                 <TextBlock Text="Startup" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,12" />
                                 <CheckBox Content="Start with Windows" IsChecked="{Binding StartWithWindows}" FontSize="14"
-                                          ToolTip="Open Equalizer Helper automatically when you sign in to Windows" />
+                                          ToolTip="Open LocoMic automatically when you sign in to Windows" />
                             </StackPanel>
                         </Border>
 

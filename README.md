@@ -1,4 +1,4 @@
-# Equalizer Helper
+# LocoMic
 
 A Windows desktop app that cleans up (or messes with) your microphone in real time. It captures your physical mic, runs it through a 6-band EQ plus optional pitch shift and "mic crunch" effects, and sends the result to a virtual audio cable so Discord, OBS, Zoom or any other app can use the processed voice as its microphone.
 
@@ -55,7 +55,7 @@ A Windows desktop app that cleans up (or messes with) your microphone in real ti
 
 ## Download
 
-Grab `EqualizerHelper-<version>-win-x64.zip` from the [Releases](https://github.com/BatuhanBeysumengu/Equalizer/releases) page, unzip it and run `EqualizerHelper.exe`. It's a single self-contained file, so there's nothing to install (you still need [VB-Audio Virtual Cable](https://vb-audio.com/Cable/)). The exe isn't code-signed yet, so Windows SmartScreen may warn the first time: click **More info → Run anyway**.
+Grab `LocoMic-<version>-win-x64.zip` from the [Releases](https://github.com/BatuhanBeysumengu/Equalizer/releases) page, unzip it and run `LocoMic.exe`. It's a single self-contained file, so there's nothing to install (you still need [VB-Audio Virtual Cable](https://vb-audio.com/Cable/)). The exe isn't code-signed yet, so Windows SmartScreen may warn the first time: click **More info → Run anyway**.
 
 ## Getting started
 
@@ -90,7 +90,7 @@ Everything you use day to day is on the main screen. Devices, hotkeys, startup a
 
 Closing the window keeps the app in the system tray; use the tray menu to show it, start/stop processing, or exit.
 
-Your presets and settings are saved in `%APPDATA%\EqualizerHelper\` (`presets.json`, `settings.json`).
+Your presets and settings are saved in `%APPDATA%\LocoMic\` (`presets.json`, `settings.json`).
 
 ## Tech stack
 
@@ -105,6 +105,8 @@ Your presets and settings are saved in `%APPDATA%\EqualizerHelper\` (`presets.js
 | Tests         | xUnit |
 
 ## Project structure
+
+(The code projects keep their original `EqualizerHelper.*` names; the app itself is called LocoMic.)
 
 ```
 EqualizerHelper.sln
@@ -129,7 +131,7 @@ Signal chain: `Mic → Noise removal → Gain → Gate → EQ → Pitch shift �
 dotnet publish src/EqualizerHelper.App -p:PublishProfile=win-x64
 ```
 
-This produces a single self-contained `EqualizerHelper.exe` (no .NET install needed, RNNoise bundled) in `src/EqualizerHelper.App/bin/publish/win-x64/`.
+This produces a single self-contained `LocoMic.exe` (no .NET install needed, RNNoise bundled) in `src/EqualizerHelper.App/bin/publish/win-x64/`.
 
 ## Running the tests
 

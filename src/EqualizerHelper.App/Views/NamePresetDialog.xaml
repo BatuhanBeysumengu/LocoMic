@@ -4,7 +4,7 @@
         Title="Save Preset" SizeToContent="Height" Width="360"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
         ShowInTaskbar="False" Style="{StaticResource DialogWindowStyle}"
-        Icon="pack://application:,,,/EqualizerHelper;component/Assets/app.ico">
+        Icon="pack://application:,,,/LocoMic;component/Assets/app.ico">
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

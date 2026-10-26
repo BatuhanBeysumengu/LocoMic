@@ -25,7 +25,7 @@ public class TrayIconService : IDisposable
 
         var menu = new ContextMenuStrip();
 
-        var showItem = new ToolStripMenuItem("Show Equalizer Helper");
+        var showItem = new ToolStripMenuItem("Show LocoMic");
         showItem.Click += (_, _) => ShowRequested?.Invoke(this, EventArgs.Empty);
         menu.Items.Add(showItem);
 
@@ -48,7 +48,7 @@ public class TrayIconService : IDisposable
             Icon = AppIconFactory.CreateIcon(),
             Visible = true,
             ContextMenuStrip = menu,
-            Text = "Equalizer Helper",
+            Text = "LocoMic",
         };
         _notifyIcon.DoubleClick += (_, _) => ShowRequested?.Invoke(this, EventArgs.Empty);
 
@@ -72,7 +72,7 @@ public class TrayIconService : IDisposable
 
         // The tray tooltip doubles as feedback for hotkeys used while the window is hidden.
         string state = !running ? "Stopped" : _viewModel.IsMuted ? "Muted" : "Running";
-        string text = $"Equalizer Helper — {state}";
+        string text = $"LocoMic — {state}";
         if (_viewModel.SelectedPreset != null)
         {
             text += $" — {_viewModel.SelectedPreset.Name}";
