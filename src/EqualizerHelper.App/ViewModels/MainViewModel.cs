@@ -144,6 +144,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private double micCrunch;
 
+    [ObservableProperty]
+    private double inputGainDb;
+
+    [ObservableProperty]
+    private double gate;
+
+    [ObservableProperty]
+    private double loudness;
+
     partial void OnStartWithWindowsChanged(bool value)
     {
         StartupRegistration.SetEnabled(value);
@@ -158,6 +167,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         _engine.MicCrunchAmount = value;
     }
+
+    partial void OnInputGainDbChanged(double value) => _engine.Dynamics.InputGainDb = value;
+
+    partial void OnGateChanged(double value)
+    {
+        _engine.Dynamics.Gate = value;
+        OnPropertyChanged(nameof(GateDisplay));
+    }
+
+    partial void OnLoudnessChanged(double value) => _engine.Dynamics.Loudness = value;
+
+    public string GateDisplay => Gate <= 0 ? "Off" : $"{DynamicsSettings.GateThresholdDb(Gate):0} dB";
 
     partial void OnBypassChanged(bool value)
     {
@@ -232,6 +253,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         PitchSemitones = preset.PitchSemitones;
         MicCrunch = preset.MicCrunch;
+        InputGainDb = preset.InputGainDb;
+        Gate = preset.Gate;
+        Loudness = preset.Loudness;
     }
 
     [RelayCommand]
@@ -492,7 +516,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
             FilterType = b.Band.FilterType,
         }).ToList();
 
-        return new EqPreset(name, bandSettings) { PitchSemitones = PitchSemitones, MicCrunch = MicCrunch };
+        return new EqPreset(name, bandSettings)
+        {
+            PitchSemitones = PitchSemitones,
+            MicCrunch = MicCrunch,
+            InputGainDb = InputGainDb,
+            Gate = Gate,
+            Loudness = Loudness,
+        };
     }
 
     private void StoreUserPreset(EqPreset preset)
@@ -525,6 +556,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }).ToList();
         to.PitchSemitones = from.PitchSemitones;
         to.MicCrunch = from.MicCrunch;
+        to.InputGainDb = from.InputGainDb;
+        to.Gate = from.Gate;
+        to.Loudness = from.Loudness;
     }
 
     private void NotifyPresetActionsChanged()

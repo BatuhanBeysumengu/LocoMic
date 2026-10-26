@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,6 +41,12 @@ public class MicProcessingEngine : IDisposable
     /// </summary>
     public double MicCrunchAmount { get; set; }
 
+    /// <summary>
+    /// Input gain + noise gate (start of chain) and loudness compressor +
+    /// safety limiter (end of chain). Mutate the properties live.
+    /// </summary>
+    public DynamicsSettings Dynamics { get; } = new();
+
     public bool IsRunning { get; private set; }
     public float InputLevel => _inputMeter?.CurrentLevel ?? 0f;
     public float OutputLevel => _outputMeter?.CurrentLevel ?? 0f;
@@ -71,7 +77,8 @@ public class MicProcessingEngine : IDisposable
 
         _mainBuffer = new BufferedWaveProvider(captureFormat) { DiscardOnBufferOverflow = true };
         var mainChain = new EqChain(bands, channels, sampleRate);
-        _inputMeter = new LevelMeteringSampleProvider(_mainBuffer.ToSampleProvider());
+        var mainInputDynamics = new InputDynamicsSampleProvider(_mainBuffer.ToSampleProvider(), sampleRate, () => Dynamics, () => Bypass);
+        _inputMeter = new LevelMeteringSampleProvider(mainInputDynamics);
         var mainEq = new EqSampleProvider(_inputMeter, mainChain, () => Bypass);
         _outputMeter = new LevelMeteringSampleProvider(mainEq);
         _analysisTap = new AnalysisTapSampleProvider(_outputMeter);
@@ -85,7 +92,8 @@ public class MicProcessingEngine : IDisposable
             outputMixFormat = client.MixFormat;
         }
 
-        var mainResampled = new MediaFoundationResampler(mainCompressor.ToWaveProvider(), outputMixFormat)
+        var mainOutputDynamics = new OutputDynamicsSampleProvider(mainCompressor, sampleRate, () => Dynamics, () => Bypass);
+        var mainResampled = new MediaFoundationResampler(mainOutputDynamics.ToWaveProvider(), outputMixFormat)
         {
             ResamplerQuality = 60,
         };
@@ -97,7 +105,8 @@ public class MicProcessingEngine : IDisposable
         {
             _monitorBuffer = new BufferedWaveProvider(captureFormat) { DiscardOnBufferOverflow = true };
             var monitorChain = new EqChain(bands, channels, sampleRate);
-            var monitorEq = new EqSampleProvider(_monitorBuffer.ToSampleProvider(), monitorChain, () => Bypass);
+            var monitorInputDynamics = new InputDynamicsSampleProvider(_monitorBuffer.ToSampleProvider(), sampleRate, () => Dynamics, () => Bypass);
+            var monitorEq = new EqSampleProvider(monitorInputDynamics, monitorChain, () => Bypass);
             var monitorPitch = new PitchShiftSampleProvider(monitorEq, () => PitchRatio);
             var monitorDistortion = new DistortionSampleProvider(monitorPitch, () => MicCrunchAmount);
             var monitorCompressor = new CompressorSampleProvider(monitorDistortion, sampleRate, () => MicCrunchAmount);
@@ -108,7 +117,8 @@ public class MicProcessingEngine : IDisposable
                 monitorMixFormat = client.MixFormat;
             }
 
-            var monitorResampled = new MediaFoundationResampler(monitorCompressor.ToWaveProvider(), monitorMixFormat)
+            var monitorOutputDynamics = new OutputDynamicsSampleProvider(monitorCompressor, sampleRate, () => Dynamics, () => Bypass);
+            var monitorResampled = new MediaFoundationResampler(monitorOutputDynamics.ToWaveProvider(), monitorMixFormat)
             {
                 ResamplerQuality = 60,
             };

@@ -18,7 +18,7 @@ public static class PresetStore
         return new List<EqPreset>
         {
             BuildPreset("Flat", 0, 0, 0, 0, 0, 0, 0, 0),
-            BuildPreset("Voice Clarity", 0, 0, -3, -3, 0, 4, -2, 2),
+            WithDynamics(BuildPreset("Voice Clarity", 0, 0, -3, -3, 0, 4, -2, 2), gate: 0.3, loudness: 0.4),
             BuildPreset("De-Boom", 0, 0, -6, -4, 0, 0, 0, 0),
             BuildPreset("De-Harsh Sibilance", 0, 0, 0, 0, 0, 0, -6, 0),
             // Fun preset: heavy low-end, hard-cut highs, an actual pitch
@@ -31,6 +31,13 @@ public static class PresetStore
             // unintelligible noise.
             BuildPreset("Deep Bass (Fun)", -8, 0.6, 10, 6, 2, -5, -8, -12),
         };
+    }
+
+    private static EqPreset WithDynamics(EqPreset preset, double gate, double loudness)
+    {
+        preset.Gate = gate;
+        preset.Loudness = loudness;
+        return preset;
     }
 
     private static EqPreset BuildPreset(string name, double pitchSemitones, double micCrunch, params double[] gainsDb)

@@ -16,9 +16,13 @@ A Windows desktop app that cleans up (or messes with) your microphone in real ti
   | Air       | 10 kHz    | High shelf |
 
 - **Auto-tune** – listens to your voice for a few seconds, measures each band and nudges the gains toward a natural voice curve. Afterwards you can **Keep** the result (and optionally save it as a preset) or **Revert** it.
+- **Dynamics** – three simple sliders:
+  - **Gain** – boost or lower a quiet/loud mic before processing.
+  - **Gate** – turns the mic down when you're not talking, hiding keyboard, fan and room noise.
+  - **Loudness** – evens out your volume and makes your voice fuller (compressor), with an always-on limiter so the output never clips.
 - **Pitch shift** – raise or lower your voice in semitones.
 - **Mic Crunch** – distortion + compression for an overdriven-mic effect.
-- **Presets** – built-in presets (Flat, Voice Clarity, De-Boom, De-Harsh Sibilance, Deep Bass (Fun)), plus as many presets of your own as you like. Every preset (built-in ones too) can be tweaked and saved, and each one stores the EQ, pitch and Mic Crunch.
+- **Presets** – built-in presets (Flat, Voice Clarity, De-Boom, De-Harsh Sibilance, Deep Bass (Fun)), plus as many presets of your own as you like. Every preset (built-in ones too) can be tweaked and saved, and each one stores the EQ, dynamics, pitch and Mic Crunch.
 - **Bypass** – instantly compare processed vs. original sound.
 - **Monitoring** – hear yourself through headphones while tuning.
 - **Live level meters** for input and output.
@@ -50,7 +54,7 @@ Or open `EqualizerHelper.sln` in Visual Studio 2022 and press F5.
 3. Optionally tick **"Hear yourself while tuning, via:"** and choose your headphones.
 4. Press **Start**.
 5. **Shape your sound** – choose a preset, drag the EQ sliders, or press **Auto-Tune Voice** and talk normally for a few seconds, then click **Keep** or **Revert**.
-6. Adjust **Pitch** and **Mic Crunch** if you want an effect.
+6. Set the **Dynamics**: raise **Gain** if the *Input* meter barely moves, raise **Gate** until background noise disappears between words, and add **Loudness** for a fuller, more even voice. Adjust **Pitch** and **Mic Crunch** if you want an effect.
 7. **Manage presets** (next to the *Preset* dropdown):
    - **+ New preset...** (top of the dropdown) – creates a new preset from your current settings under a name of your choice.
    - **Save** – stores your changes into the selected preset.
@@ -69,7 +73,7 @@ Your presets and settings are saved in `%APPDATA%\EqualizerHelper\` (`presets.js
 | UI            | WPF with a custom dark theme, MVVM via [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) |
 | Tray icon     | Windows Forms `NotifyIcon` |
 | Audio I/O     | [NAudio](https://github.com/naudio/NAudio) (WASAPI capture/playback, Media Foundation resampling) |
-| DSP           | Hand-written: biquad filters (RBJ cookbook), compressor, distortion, pitch shifter, band analyzer |
+| DSP           | Hand-written: biquad filters (RBJ cookbook), compressor, limiter, noise gate, distortion, pitch shifter, band analyzer |
 | Tests         | xUnit |
 
 ## Project structure
@@ -78,7 +82,8 @@ Your presets and settings are saved in `%APPDATA%\EqualizerHelper\` (`presets.js
 EqualizerHelper.sln
 src/
   EqualizerHelper.Dsp/     Pure DSP (no dependencies): biquad filters, EQ chain,
-                           compressor, distortion, pitch shifter, band analyzer
+                           compressor, limiter, noise gate, distortion,
+                           pitch shifter, band analyzer
   EqualizerHelper.Audio/   NAudio integration: device enumeration, the real-time
                            processing engine and sample providers, level meters
   EqualizerHelper.App/     WPF app: main window, view models, presets, settings,
@@ -87,7 +92,7 @@ tests/
   EqualizerHelper.Dsp.Tests/   Unit tests for the DSP library
 ```
 
-Signal chain: `Mic → EQ → Pitch shift → Distortion → Compressor → Output (virtual cable)`, with an optional parallel copy to your headphones for monitoring.
+Signal chain: `Mic → Gain → Gate → EQ → Pitch shift → Mic Crunch → Loudness → Limiter → Output (virtual cable)`, with an optional parallel copy to your headphones for monitoring.
 
 ## Running the tests
 

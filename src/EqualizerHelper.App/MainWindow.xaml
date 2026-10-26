@@ -7,8 +7,8 @@
         xmlns:converters="clr-namespace:EqualizerHelper.App.Converters"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         mc:Ignorable="d"
-        Title="Equalizer Helper" Height="760" Width="1040"
-        MinHeight="680" MinWidth="900"
+        Title="Equalizer Helper" Height="800" Width="1040"
+        MinHeight="720" MinWidth="900"
         WindowStyle="None"
         Closed="MainWindow_OnClosed">
     <shell:WindowChrome.WindowChrome>
@@ -223,6 +223,48 @@
                         <TextBlock Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center"
                                    Foreground="{StaticResource AccentBrush}" Width="70">
                             <Run Text="{Binding MicCrunch, StringFormat={}{0:P0}}" />
+                        </TextBlock>
+                    </Grid>
+
+                    <!-- Dynamics: input gain, noise gate, loudness (compressor + safety limiter) -->
+                    <Grid Margin="0,16,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="60" />
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="60" />
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="60" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="Gain:" Style="{StaticResource SectionLabelStyle}"
+                                   ToolTip="Boosts or lowers the mic before any processing" />
+                        <Slider Grid.Column="1" Style="{StaticResource HorizontalSliderStyle}" Minimum="-12" Maximum="24"
+                                Value="{Binding InputGainDb}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center"
+                                   Foreground="{StaticResource AccentBrush}">
+                            <Run Text="{Binding InputGainDb, StringFormat={}{0:+0;-0;0} dB}" />
+                        </TextBlock>
+
+                        <TextBlock Grid.Column="4" Text="Gate:" Style="{StaticResource SectionLabelStyle}"
+                                   ToolTip="Turns the mic down when you're not talking (hides keyboard, fan and room noise). Raise it until the noise disappears between words." />
+                        <Slider Grid.Column="5" Style="{StaticResource HorizontalSliderStyle}" Minimum="0" Maximum="1"
+                                Value="{Binding Gate}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="6" Margin="10,0,0,0" VerticalAlignment="Center"
+                                   Foreground="{StaticResource AccentBrush}" Text="{Binding GateDisplay}" />
+
+                        <TextBlock Grid.Column="8" Text="Loudness:" Style="{StaticResource SectionLabelStyle}"
+                                   ToolTip="Evens out your volume and makes your voice fuller and louder. A limiter always stops the output from clipping." />
+                        <Slider Grid.Column="9" Style="{StaticResource HorizontalSliderStyle}" Minimum="0" Maximum="1"
+                                Value="{Binding Loudness}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="10" Margin="10,0,0,0" VerticalAlignment="Center"
+                                   Foreground="{StaticResource AccentBrush}">
+                            <Run Text="{Binding Loudness, StringFormat={}{0:P0}}" />
                         </TextBlock>
                     </Grid>
                 </StackPanel>
