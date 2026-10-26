@@ -134,6 +134,14 @@ dotnet publish src/EqualizerHelper.App -p:PublishProfile=win-x64
 
 This produces a single self-contained `LocoMic.exe` (no .NET install needed, RNNoise bundled) in `src/EqualizerHelper.App/bin/publish/win-x64/`.
 
+## License
+
+Copyright (C) 2026 Batuhan Beysümengü
+
+LocoMic is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3. See [LICENSE](LICENSE) for the full text.
+
+LocoMic uses third-party components (NAudio, RNNoise, RNNoise.NET, the .NET Community Toolkit and the .NET runtime) under their own licenses; see [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt).
+
 ## Running the tests
 
 ```bash

@@ -156,6 +156,24 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public IReadOnlyList<AppTheme> Themes => ThemeService.Themes;
 
+    /// <summary>"LocoMic 1.0.0 · Copyright (C) ..." from the assembly's metadata.</summary>
+    public string AboutText
+    {
+        get
+        {
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            string version = assembly.GetName().Version?.ToString(3) ?? string.Empty;
+            string copyright = (System.Attribute.GetCustomAttribute(assembly, typeof(System.Reflection.AssemblyCopyrightAttribute))
+                as System.Reflection.AssemblyCopyrightAttribute)?.Copyright ?? string.Empty;
+            return $"LocoMic {version}  ·  {copyright}";
+        }
+    }
+
+    public const string ProjectUrl = "https://github.com/BatuhanBeysumengu/LocoMic";
+
+    [RelayCommand]
+    private void OpenProjectPage() => Process.Start(new ProcessStartInfo(ProjectUrl) { UseShellExecute = true });
+
     [ObservableProperty]
     private AppTheme selectedTheme;
 

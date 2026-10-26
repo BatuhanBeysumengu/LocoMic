@@ -748,6 +748,17 @@
 
                         <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
                             <StackPanel>
+                                <TextBlock Text="About" Style="{StaticResource CardTitleStyle}" />
+                                <TextBlock Text="{Binding AboutText}" Margin="0,8,0,0" TextWrapping="Wrap" />
+                                <TextBlock Style="{StaticResource HelpTextStyle}" Margin="0,4,0,10"
+                                           Text="LocoMic is free software under the GNU General Public License v3. See the LICENSE and THIRD-PARTY-NOTICES files that come with the app." />
+                                <Button Content="Open project page" HorizontalAlignment="Left" Command="{Binding OpenProjectPageCommand}"
+                                        ToolTip="Open LocoMic on GitHub (source code, license and downloads)" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
+                            <StackPanel>
                                 <TextBlock Text="Startup" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,12" />
                                 <CheckBox Content="Start with Windows" IsChecked="{Binding StartWithWindows}" FontSize="14"
                                           ToolTip="Open LocoMic automatically when you sign in to Windows" />
