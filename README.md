@@ -56,13 +56,13 @@ A Windows desktop app that cleans up (or messes with) your microphone in real ti
 
 ## Download
 
-Grab `LocoMic-<version>-win-x64.zip` from the [Releases](https://github.com/BatuhanBeysumengu/Equalizer/releases) page, unzip it and run `LocoMic.exe`. It's a single self-contained file, so there's nothing to install (you still need [VB-Audio Virtual Cable](https://vb-audio.com/Cable/)). The exe isn't code-signed yet, so Windows SmartScreen may warn the first time: click **More info → Run anyway**.
+Grab `LocoMic-<version>-win-x64.zip` from the [Releases](https://github.com/BatuhanBeysumengu/LocoMic/releases) page, unzip it and run `LocoMic.exe`. It's a single self-contained file, so there's nothing to install (you still need [VB-Audio Virtual Cable](https://vb-audio.com/Cable/)). The exe isn't code-signed yet, so Windows SmartScreen may warn the first time: click **More info → Run anyway**.
 
 ## Getting started
 
 ```bash
-git clone https://github.com/BatuhanBeysumengu/Equalizer.git
-cd Equalizer
+git clone https://github.com/BatuhanBeysumengu/LocoMic.git
+cd LocoMic
 dotnet run --project src/EqualizerHelper.App
 ```
 
