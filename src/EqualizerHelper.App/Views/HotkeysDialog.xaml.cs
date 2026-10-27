@@ -51,9 +51,10 @@ public partial class HotkeysDialog : Window
             IsReadOnly = true,
             IsReadOnlyCaretVisible = false,
             Margin = new Thickness(0, 4, 8, 4),
-            ToolTip = "Click here, then press the key combination",
+            ToolTip = "Click here, then press a key combination or a side mouse button (Mouse4/Mouse5)",
         };
         box.PreviewKeyDown += (_, e) => OnBoxKeyDown(action, e);
+        box.PreviewMouseDown += (_, e) => OnBoxMouseDown(action, e);
         Grid.SetRow(box, row);
         Grid.SetColumn(box, 1);
         RowsGrid.Children.Add(box);
@@ -69,6 +70,20 @@ public partial class HotkeysDialog : Window
         Grid.SetColumn(clear, 2);
         RowsGrid.Children.Add(clear);
 
+        Refresh(action);
+    }
+
+    private void OnBoxMouseDown(HotkeyAction action, MouseButtonEventArgs e)
+    {
+        // Left click just selects the box; only the side buttons can be hotkeys.
+        if (!HotkeyGesture.IsAllowedMouseButton(e.ChangedButton))
+        {
+            return;
+        }
+
+        e.Handled = true;
+        HideError();
+        _hotkeys[action] = HotkeyGesture.ForMouse(Keyboard.Modifiers, e.ChangedButton);
         Refresh(action);
     }
 

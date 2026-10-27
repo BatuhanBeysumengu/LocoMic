@@ -24,10 +24,29 @@ public enum HotkeyAction
 }
 
 /// <summary>
-/// A key plus modifiers, stored as text like "Ctrl+Alt+B" in settings.json.
+/// A key (or a side mouse button) plus modifiers, stored as text like
+/// "Ctrl+Alt+B" or "Mouse4" in settings.json. When <see cref="Mouse"/> is set
+/// the gesture is a mouse button and <see cref="Key"/> is Key.None.
 /// </summary>
-public record HotkeyGesture(ModifierKeys Modifiers, Key Key)
+public record HotkeyGesture(ModifierKeys Modifiers, Key Key, MouseButton? Mouse = null)
 {
+    /// <summary>A side mouse button (Mouse4 = XButton1, Mouse5 = XButton2), with optional modifiers.</summary>
+    public static HotkeyGesture ForMouse(ModifierKeys modifiers, MouseButton button) => new(modifiers, Key.None, button);
+
+    /// <summary>Only the side buttons can be hotkeys; left/right/middle click are needed for normal use.</summary>
+    public static bool IsAllowedMouseButton(MouseButton button) => button is MouseButton.XButton1 or MouseButton.XButton2;
+
+    /// <summary>The Windows virtual-key code of the key (0 for mouse gestures).</summary>
+    public int VirtualKey => Mouse == null ? KeyInterop.VirtualKeyFromKey(Key) : 0;
+
+    /// <summary>True if a key press with exactly these modifiers should trigger this hotkey.</summary>
+    public bool MatchesKey(int virtualKey, ModifierKeys modifiers) =>
+        Mouse == null && Modifiers == modifiers && VirtualKey == virtualKey;
+
+    /// <summary>True if a mouse button press with exactly these modifiers should trigger this hotkey.</summary>
+    public bool MatchesMouse(MouseButton button, ModifierKeys modifiers) =>
+        Mouse == button && Modifiers == modifiers;
+
     public static IReadOnlyDictionary<HotkeyAction, HotkeyGesture> Defaults { get; } = new Dictionary<HotkeyAction, HotkeyGesture>
     {
         [HotkeyAction.ToggleBypass] = new(ModifierKeys.Control | ModifierKeys.Alt, Key.B),
@@ -85,7 +104,7 @@ public record HotkeyGesture(ModifierKeys Modifiers, Key Key)
         if (Modifiers.HasFlag(ModifierKeys.Alt)) parts.Add("Alt");
         if (Modifiers.HasFlag(ModifierKeys.Shift)) parts.Add("Shift");
         if (Modifiers.HasFlag(ModifierKeys.Windows)) parts.Add("Win");
-        parts.Add(KeyName(Key));
+        parts.Add(Mouse is MouseButton button ? MouseName(button) : KeyName(Key));
         return string.Join("+", parts);
     }
 
@@ -98,6 +117,7 @@ public record HotkeyGesture(ModifierKeys Modifiers, Key Key)
 
         var modifiers = ModifierKeys.None;
         Key? key = null;
+        MouseButton? mouse = null;
         foreach (string part in text.Split('+', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
             switch (part.ToLowerInvariant())
@@ -106,6 +126,8 @@ public record HotkeyGesture(ModifierKeys Modifiers, Key Key)
                 case "alt": modifiers |= ModifierKeys.Alt; break;
                 case "shift": modifiers |= ModifierKeys.Shift; break;
                 case "win": modifiers |= ModifierKeys.Windows; break;
+                case "mouse4": mouse = MouseButton.XButton1; break;
+                case "mouse5": mouse = MouseButton.XButton2; break;
                 default:
                     key = ParseKeyName(part);
                     if (key == null)
@@ -115,6 +137,11 @@ public record HotkeyGesture(ModifierKeys Modifiers, Key Key)
 
                     break;
             }
+        }
+
+        if (mouse is MouseButton button)
+        {
+            return key == null ? ForMouse(modifiers, button) : null;
         }
 
         if (key == null || (modifiers == ModifierKeys.None && !IsAllowedWithoutModifiers(key.Value)))
@@ -131,6 +158,8 @@ public record HotkeyGesture(ModifierKeys Modifiers, Key Key)
         >= Key.NumPad0 and <= Key.NumPad9 => "Num" + (int)(key - Key.NumPad0),
         _ => key.ToString(),
     };
+
+    private static string MouseName(MouseButton button) => button == MouseButton.XButton1 ? "Mouse4" : "Mouse5";
 
     private static Key? ParseKeyName(string name)
     {

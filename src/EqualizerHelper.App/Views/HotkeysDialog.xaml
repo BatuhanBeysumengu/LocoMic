@@ -6,7 +6,7 @@
         ShowInTaskbar="False" Style="{StaticResource DialogWindowStyle}">
     <StackPanel Margin="16">
         <TextBlock TextWrapping="Wrap" Margin="0,0,0,12"
-                   Text="These work anywhere in Windows, even while you're in a game or the app is in the tray. Click a box and press the keys you want (Ctrl, Alt, Shift or Win plus a key; numpad keys can be used on their own). Sound keys only work while the app is started." />
+                   Text="These work anywhere in Windows, even while you're in a game or the app is in the tray. Click a box and press the keys you want (Ctrl, Alt, Shift or Win plus a key; numpad keys and the side mouse buttons Mouse4/Mouse5 can be used on their own). Keys still reach your game too. Sound keys only work while the app is started." />
 
         <ScrollViewer MaxHeight="440" VerticalScrollBarVisibility="Auto">
             <Grid x:Name="RowsGrid" Margin="0,0,6,0">

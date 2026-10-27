@@ -46,7 +46,7 @@ public partial class MainWindow : Window
         IntPtr hwnd = new WindowInteropHelper(this).Handle;
         DarkTitleBar.Apply(this);
 
-        _hotkeys = new GlobalHotkeyService(hwnd);
+        _hotkeys = new GlobalHotkeyService();
         RegisterHotkeys();
         _viewModel.HotkeysChanged += (_, _) => RegisterHotkeys();
         _viewModel.HotkeyEditingChanged += (_, editing) =>
@@ -80,7 +80,6 @@ public partial class MainWindow : Window
         }
 
         _hotkeys.UnregisterAll();
-        var failed = new List<string>();
 
         bool soundKeysActive = _viewModel.IsRunning && _viewModel.SoundHotkeysEnabled;
         foreach (var (action, gesture) in _viewModel.Hotkeys)
@@ -90,9 +89,9 @@ public partial class MainWindow : Window
                 continue;
             }
 
-            if (gesture != null && !_hotkeys.Register(gesture, () => _viewModel.ExecuteHotkey(action)))
+            if (gesture != null)
             {
-                failed.Add(gesture.ToString());
+                _hotkeys.Register(gesture, () => _viewModel.ExecuteHotkey(action));
             }
         }
 
@@ -100,16 +99,12 @@ public partial class MainWindow : Window
         {
             int presetNumber = number;
             var gesture = new HotkeyGesture(HotkeyGesture.PresetNumberModifiers, Key.D0 + number);
-            if (!_hotkeys.Register(gesture, () => _viewModel.SelectPresetByNumber(presetNumber)))
-            {
-                failed.Add(gesture.ToString());
-            }
+            _hotkeys.Register(gesture, () => _viewModel.SelectPresetByNumber(presetNumber));
         }
 
-        if (failed.Count > 0)
+        if (!_hotkeys.IsActive)
         {
-            _viewModel.StatusMessage =
-                $"Some hotkeys are already used by another app and won't work: {string.Join(", ", failed)}. Change them under Hotkeys.";
+            _viewModel.StatusMessage = "Hotkeys couldn't be enabled. Try restarting LocoMic.";
         }
     }
 
