@@ -14,6 +14,10 @@ public partial class App : System.Windows.Application
     // mic/output devices, and both independently read-modify-write the same
     // presets.json/settings.json files, silently losing each other's changes.
     private const string SingleInstanceMutexName = "LocoMic-SingleInstance-7F3D1A2B";
+
+    // A second launch signals this event so the running copy shows its window.
+    private const string ShowWindowEventName = "LocoMic-ShowWindow-7F3D1A2B";
+    private EventWaitHandle? _showWindowEvent;
     private Mutex? _singleInstanceMutex;
     private bool _ownsSingleInstanceMutex;
 
@@ -29,11 +33,14 @@ public partial class App : System.Windows.Application
         _ownsSingleInstanceMutex = createdNew;
         if (!createdNew)
         {
-            System.Windows.MessageBox.Show(
-                "LocoMic is already running. Check your system tray for its icon.",
-                "LocoMic",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            // Already running: bring that copy to the front instead of starting
+            // a second one (two copies would overwrite each other's settings).
+            if (EventWaitHandle.TryOpenExisting(ShowWindowEventName, out var showExisting))
+            {
+                showExisting.Set();
+                showExisting.Dispose();
+            }
+
             Shutdown();
             return;
         }
@@ -41,6 +48,20 @@ public partial class App : System.Windows.Application
         var mainWindow = new MainWindow();
         MainWindow = mainWindow;
         mainWindow.Show();
+
+        _showWindowEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ShowWindowEventName);
+        var listener = new Thread(() =>
+        {
+            while (_showWindowEvent.WaitOne())
+            {
+                Dispatcher.BeginInvoke(() => mainWindow.RestoreFromTray());
+            }
+        })
+        {
+            IsBackground = true,
+            Name = "LocoMic show-window listener",
+        };
+        listener.Start();
     }
 
     protected override void OnExit(ExitEventArgs e)

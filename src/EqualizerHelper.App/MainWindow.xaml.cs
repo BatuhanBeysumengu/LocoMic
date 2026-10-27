@@ -108,7 +108,8 @@ public partial class MainWindow : Window
         }
     }
 
-    private void RestoreFromTray()
+    /// <summary>Shows the window from the tray (or another launch of the app) and brings it to the front.</summary>
+    public void RestoreFromTray()
     {
         Show();
         WindowState = WindowState.Normal;
