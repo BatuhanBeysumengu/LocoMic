@@ -15,6 +15,7 @@ public partial class App : System.Windows.Application
     // presets.json/settings.json files, silently losing each other's changes.
     private const string SingleInstanceMutexName = "LocoMic-SingleInstance-7F3D1A2B";
     private Mutex? _singleInstanceMutex;
+    private bool _ownsSingleInstanceMutex;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -25,6 +26,7 @@ public partial class App : System.Windows.Application
         Services.ThemeService.Apply(Services.ThemeService.Find(Services.AppSettingsStore.Load().Theme));
 
         _singleInstanceMutex = new Mutex(true, SingleInstanceMutexName, out bool createdNew);
+        _ownsSingleInstanceMutex = createdNew;
         if (!createdNew)
         {
             System.Windows.MessageBox.Show(
@@ -43,7 +45,13 @@ public partial class App : System.Windows.Application
 
     protected override void OnExit(ExitEventArgs e)
     {
-        _singleInstanceMutex?.ReleaseMutex();
+        // A second copy that only showed "already running" never owned the
+        // mutex; releasing it anyway throws and crashes the app on exit.
+        if (_ownsSingleInstanceMutex)
+        {
+            _singleInstanceMutex?.ReleaseMutex();
+        }
+
         _singleInstanceMutex?.Dispose();
         base.OnExit(e);
     }
